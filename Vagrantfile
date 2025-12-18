@@ -135,7 +135,7 @@ Vagrant.configure("2") do |config|
       echo "Configurazione Attaccante..."
       
       # Installazione strumenti
-      sudo apt update && sudo apt install -y tcpdump net-tools python3 python3-pip python3.11-venv screen rsync iptables
+      sudo apt update && sudo apt install -y tcpdump net-tools python3 python3-pip screen rsync iptables python3-scapy
       
       # 1. Installazione librerie python 
       #python3 -m venv /home/vagrant/syn_venv
@@ -144,9 +144,11 @@ Vagrant.configure("2") do |config|
       #pip3 install scapy numpy
       
       # 2. Configurazione Rotte Statiche:
-      sudo ip route add 192.168.4.0/24 via 192.168.20.254 dev eth1
-      sudo ip route add 192.168.5.0/24 via 192.168.20.254 dev eth1
-      
+      #sudo ip route add 192.168.4.0/24 via 192.168.20.254 dev eth1
+      #sudo ip route add 192.168.5.0/24 via 192.168.20.254 dev eth1
+      sudo ip route add 192.168.4.0/24 via 192.168.20.254
+      sudo ip route add 192.168.5.0/24 via 192.168.20.254
+
       # 3. Regola IPTABLES Cruciale: Blocca i pacchetti RST (e ICMP se necessario)
       #sudo iptables -A INPUT -p tcp --tcp-flags RST RST -s 192.168.4.100 -j DROP # Blocca RST in arrivo dallo Zombie
       sudo iptables -A OUTPUT -p tcp --tcp-flags RST RST -d 192.168.4.100 -j DROP
