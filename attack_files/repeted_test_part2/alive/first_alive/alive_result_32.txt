@@ -1,0 +1,314 @@
+**.*********2025-12-17 15:56:06,315 - INFO - Total canaries: 11, ACKs: 11,  SYN-ACKs: 0
+Begin emission:
+Finished sending 22 packets.
+
+Received 0 packets, got 0 answers, remaining 22 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 12 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:63181 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:57505 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52606 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55477 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50867 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:63541 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58575 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52399 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64393 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64099 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62979 A
+Target alive
+
+*******2025-12-17 16:09:49,198 - INFO - Total canaries: 7, ACKs: 7,  SYN-ACKs: 0
+Begin emission:
+Finished sending 14 packets.
+
+Received 0 packets, got 0 answers, remaining 14 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60910 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52257 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55392 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60822 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52752 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:59008 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56477 A
+Target alive
+
+***.*****2025-12-17 16:28:00,023 - INFO - Total canaries: 8, ACKs: 8,  SYN-ACKs: 0
+Begin emission:
+Finished sending 16 packets.
+
+Received 0 packets, got 0 answers, remaining 16 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 9 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60182 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51613 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55200 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60991 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60318 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58177 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64938 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62225 A
+Target alive
+
+**********.*2025-12-17 16:55:09,103 - INFO - Total canaries: 11, ACKs: 11,  SYN-ACKs: 0
+Begin emission:
+Finished sending 21 packets.
+
+Received 0 packets, got 0 answers, remaining 21 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 12 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55951 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50276 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:61917 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50796 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52870 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56638 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62890 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56660 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64455 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:61117 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58564 A
+Target alive
+
+**********2025-12-17 17:20:48,123 - INFO - Total canaries: 10, ACKs: 10,  SYN-ACKs: 0
+Begin emission:
+Finished sending 20 packets.
+
+Received 0 packets, got 0 answers, remaining 20 packets
+SYN packet sent
+Begin emission:
+Finished sending 10 packets.
+
+Received 10 packets, got 10 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58962 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:54732 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56368 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52159 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51050 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52108 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55016 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51754 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62665 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56111 A
+Target alive
+
+******2025-12-17 17:30:03,194 - INFO - Total canaries: 6, ACKs: 6,  SYN-ACKs: 0
+Begin emission:
+Finished sending 12 packets.
+
+Received 0 packets, got 0 answers, remaining 12 packets
+SYN packet sent
+Begin emission:
+Finished sending 6 packets.
+
+Received 6 packets, got 6 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58367 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:53360 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:63230 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60343 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51674 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62964 A
+Target alive
+
+********2025-12-17 17:48:13,858 - INFO - Total canaries: 8, ACKs: 8,  SYN-ACKs: 0
+Begin emission:
+Finished sending 16 packets.
+
+Received 0 packets, got 0 answers, remaining 16 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64685 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58407 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55951 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50601 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60741 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51734 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:59987 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:59426 A
+Target alive
+
+************2025-12-17 18:21:22,526 - INFO - Total canaries: 12, ACKs: 12,  SYN-ACKs: 0
+Begin emission:
+Finished sending 24 packets.
+
+Received 0 packets, got 0 answers, remaining 24 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64224 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:57737 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51775 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58199 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56243 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62141 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:59773 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50567 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60723 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52124 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64290 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:53343 A
+Target alive
+
+************2025-12-17 18:54:31,026 - INFO - Total canaries: 12, ACKs: 12,  SYN-ACKs: 0
+Begin emission:
+Finished sending 24 packets.
+
+Received 0 packets, got 0 answers, remaining 24 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:53390 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58103 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:59275 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51125 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:53397 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:54083 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:54993 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:63012 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:59409 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62342 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55415 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:57917 A
+Target alive
+
+************2025-12-17 19:27:40,087 - INFO - Total canaries: 12, ACKs: 12,  SYN-ACKs: 0
+Begin emission:
+Finished sending 24 packets.
+
+Received 0 packets, got 0 answers, remaining 24 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:53638 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:53651 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50609 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62654 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52374 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:63315 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55880 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:61994 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56598 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:57374 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:65116 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:54072 A
+Target alive
+
+*******2025-12-17 19:39:53,467 - INFO - Total canaries: 7, ACKs: 7,  SYN-ACKs: 0
+Begin emission:
+Finished sending 13 packets.
+
+Received 0 packets, got 0 answers, remaining 13 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50128 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52670 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62180 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64741 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51325 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:50114 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:49937 A
+Target alive
+
+*********2025-12-17 19:59:33,782 - INFO - Total canaries: 9, ACKs: 9,  SYN-ACKs: 0
+Begin emission:
+Finished sending 17 packets.
+
+Received 0 packets, got 0 answers, remaining 17 packets
+SYN packet sent
+Begin emission:
+Finished sending 9 packets.
+
+Received 9 packets, got 9 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:63296 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:61654 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:61356 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51583 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52587 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62984 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:65316 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:61141 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:61638 A
+Target alive
+
+***********2025-12-17 20:29:42,494 - INFO - Total canaries: 11, ACKs: 11,  SYN-ACKs: 0
+Begin emission:
+Finished sending 22 packets.
+
+Received 0 packets, got 0 answers, remaining 22 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 11 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:57958 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:54574 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:56774 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:49711 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:62978 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:63837 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58117 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:57905 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64869 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60198 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51898 A
+Target alive
+
+*********2025-12-17 20:49:23,034 - INFO - Total canaries: 9, ACKs: 9,  SYN-ACKs: 0
+Begin emission:
+Finished sending 17 packets.
+
+Received 0 packets, got 0 answers, remaining 17 packets
+SYN packet sent
+Begin emission:
+Finished sending 9 packets.
+
+Received 9 packets, got 9 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:65075 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:65358 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:55685 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:58901 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:51194 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:64968 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:57789 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:60169 A
+IP / TCP 192.168.4.100:8084 > 192.168.20.100:52782 A
+Target alive
