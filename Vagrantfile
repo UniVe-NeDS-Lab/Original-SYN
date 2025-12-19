@@ -60,10 +60,12 @@ Vagrant.configure("2") do |config|
       sudo apt update && sudo apt install -y tcpdump net-tools screen build-essential rsync libncurses-dev bison flex libssl-dev libelf-dev bc dwarves
       
       # Configurazione Rotte Statica:
-      sudo ip route add 192.168.20.0/24 via 192.168.4.254 dev eth1
-      sudo ip route add 192.168.5.0/24 via 192.168.4.254 dev eth1
+      #sudo ip route add 192.168.20.0/24 via 192.168.4.254 dev eth1
+      #sudo ip route add 192.168.5.0/24 via 192.168.4.254 dev eth1
+      sudo ip route add 192.168.20.0/24 via 192.168.4.254
+      sudo ip route add 192.168.5.0/24 via 192.168.4.254
       
-      echo "Rotte statiche configurate. Avvio compilazione kernel..."
+      echo "Rotte statiche configurate"
       
       #cd /home/vagrant/zombie_files/kernel
       #make clean
@@ -81,7 +83,7 @@ Vagrant.configure("2") do |config|
       #sudo make install
       #sudo reboot
 
-      echo "Compilazione kernel completata, procedere con il reboot della macchina"
+      #echo "Compilazione kernel completata, procedere con il reboot della macchina"
 
     SHELL
     
@@ -105,11 +107,10 @@ Vagrant.configure("2") do |config|
       sudo apt update && sudo apt install -y tcpdump net-tools screen rsync iptables
       
       # Configurazione Rota Statica:
-      sudo ip route add 192.168.20.0/24 via 192.168.5.254 dev eth1
-      sudo ip route add 192.168.4.0/24 via 192.168.5.254 dev eth1
-
-      # Avviare il servizio in ascolto (es. un server netcat)
-      # netcat -lk 80 &
+      #sudo ip route add 192.168.20.0/24 via 192.168.5.254 dev eth1
+      #sudo ip route add 192.168.4.0/24 via 192.168.5.254 dev eth1
+      sudo ip route add 192.168.20.0/24 via 192.168.5.254
+      sudo ip route add 192.168.4.0/24 via 192.168.5.254
       
       echo "Configurazione target completata"
     SHELL
@@ -136,12 +137,6 @@ Vagrant.configure("2") do |config|
       
       # Installazione strumenti
       sudo apt update && sudo apt install -y tcpdump net-tools python3 python3-pip screen rsync iptables python3-scapy
-      
-      # 1. Installazione librerie python 
-      #python3 -m venv /home/vagrant/syn_venv
-      #source /home/vagrant/syn_venv/bin/activate
-
-      #pip3 install scapy numpy
       
       # 2. Configurazione Rotte Statiche:
       #sudo ip route add 192.168.4.0/24 via 192.168.20.254 dev eth1
