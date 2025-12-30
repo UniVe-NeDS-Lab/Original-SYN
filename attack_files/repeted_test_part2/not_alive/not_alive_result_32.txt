@@ -1421,3 +1421,989 @@ IP / TCP 192.168.4.100:8094 > 192.168.20.100:60622 A
 IP / TCP 192.168.4.100:8094 > 192.168.20.100:58763 A
 Target alive
 
+************2025-12-26 11:20:58,610 - INFO - Total canaries: 12, ACKs: 9,  SYN-ACKs: 3
+backlog size infeered = 31
+Begin emission:
+Finished sending 23 packets.
+
+Received 0 packets, got 0 answers, remaining 23 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56576 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61529 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54497 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53486 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50179 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58627 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51583 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53951 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58898 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53492 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57808 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62489 SA
+Target not alive
+
+*********2025-12-26 11:42:08,326 - INFO - Total canaries: 9, ACKs: 8,  SYN-ACKs: 1
+backlog size infeered = 24
+Begin emission:
+Finished sending 18 packets.
+
+Received 0 packets, got 0 answers, remaining 18 packets
+SYN packet sent
+Begin emission:
+Finished sending 9 packets.
+
+Received 9 packets, got 9 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51907 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54038 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59485 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52963 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54406 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64968 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58918 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60779 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56331 A
+Target not alive
+
+********2025-12-26 12:00:19,370 - INFO - Total canaries: 8, ACKs: 5,  SYN-ACKs: 3
+backlog size infeered = 22
+Begin emission:
+Finished sending 16 packets.
+
+Received 0 packets, got 0 answers, remaining 16 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64603 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60343 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51302 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59219 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59961 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64847 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60266 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51449 SA
+Target not alive
+
+*********2025-12-26 12:19:59,879 - INFO - Total canaries: 9, ACKs: 9,  SYN-ACKs: 0
+backlog size infeered = 23
+Begin emission:
+Finished sending 17 packets.
+
+Received 0 packets, got 0 answers, remaining 17 packets
+SYN packet sent
+Begin emission:
+Finished sending 9 packets.
+
+Received 9 packets, got 9 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55114 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52420 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52544 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53762 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63088 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53892 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50664 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61165 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49942 A
+Target alive
+
+***********2025-12-26 12:47:08,974 - INFO - Total canaries: 11, ACKs: 7,  SYN-ACKs: 4
+backlog size infeered = 28
+Begin emission:
+Finished sending 21 packets.
+
+Received 0 packets, got 0 answers, remaining 21 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 11 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58602 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61652 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51498 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61282 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57859 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50204 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54651 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65221 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53723 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58042 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59163 A
+Target not alive
+
+************2025-12-26 13:20:17,894 - INFO - Total canaries: 12, ACKs: 7,  SYN-ACKs: 5
+backlog size infeered = 32
+Begin emission:
+Finished sending 24 packets.
+
+Received 0 packets, got 0 answers, remaining 24 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64429 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59479 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65213 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64947 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50480 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65172 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62132 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53015 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50373 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64208 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55518 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56153 A
+Target not alive
+
+************2025-12-26 13:53:26,663 - INFO - Total canaries: 12, ACKs: 12,  SYN-ACKs: 0
+backlog size infeered = 32
+Begin emission:
+Finished sending 24 packets.
+
+Received 0 packets, got 0 answers, remaining 24 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52954 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61540 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49858 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61173 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56924 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52901 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59801 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49687 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64401 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62604 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52970 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58835 A
+Target alive
+
+*************2025-12-26 14:29:35,422 - INFO - Total canaries: 13, ACKs: 13,  SYN-ACKs: 0
+backlog size infeered = 34
+Begin emission:
+Finished sending 25 packets.
+
+Received 0 packets, got 0 answers, remaining 25 packets
+SYN packet sent
+Begin emission:
+Finished sending 13 packets.
+
+Received 13 packets, got 13 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57946 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57356 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53945 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49287 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61050 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59059 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50232 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63619 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59654 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54815 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64388 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58155 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60733 A
+Target alive
+
+******2025-12-26 14:38:50,622 - INFO - Total canaries: 6, ACKs: 6,  SYN-ACKs: 0
+backlog size infeered = 16
+Begin emission:
+Finished sending 12 packets.
+
+Received 0 packets, got 0 answers, remaining 12 packets
+SYN packet sent
+Begin emission:
+Finished sending 6 packets.
+
+Received 6 packets, got 6 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65122 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63963 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64289 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63836 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58370 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51565 A
+Target alive
+
+*******2025-12-26 14:51:04,018 - INFO - Total canaries: 7, ACKs: 7,  SYN-ACKs: 0
+backlog size infeered = 18
+Begin emission:
+Finished sending 13 packets.
+
+Received 0 packets, got 0 answers, remaining 13 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53171 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54219 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50286 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62259 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57847 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64320 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57711 A
+Target alive
+
+************2025-12-26 15:22:42,510 - INFO - Total canaries: 12, ACKs: 7,  SYN-ACKs: 5
+backlog size infeered = 31
+Begin emission:
+Finished sending 23 packets.
+
+Received 0 packets, got 0 answers, remaining 23 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57078 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54108 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62912 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60382 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49237 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64597 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51040 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58259 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61364 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63154 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60308 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58601 A
+Target not alive
+
+********2025-12-26 15:37:54,644 - INFO - Total canaries: 8, ACKs: 8,  SYN-ACKs: 0
+backlog size infeered = 20
+Begin emission:
+Finished sending 15 packets.
+
+Received 0 packets, got 0 answers, remaining 15 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53395 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49670 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63833 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56169 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55004 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56012 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63142 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61829 A
+Target alive
+
+********2025-12-26 15:56:05,554 - INFO - Total canaries: 8, ACKs: 6,  SYN-ACKs: 2
+backlog size infeered = 22
+Begin emission:
+Finished sending 16 packets.
+
+Received 0 packets, got 0 answers, remaining 16 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53368 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64414 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58643 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55672 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60527 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55274 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49865 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53381 A
+Target not alive
+
+***********2025-12-26 16:26:14,067 - INFO - Total canaries: 11, ACKs: 6,  SYN-ACKs: 5
+backlog size infeered = 30
+Begin emission:
+Finished sending 22 packets.
+
+Received 0 packets, got 0 answers, remaining 22 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 11 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53310 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65353 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62776 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63443 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61902 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61939 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61510 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50147 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61646 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50367 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54756 A
+Target not alive
+
+******2025-12-26 16:35:29,106 - INFO - Total canaries: 6, ACKs: 6,  SYN-ACKs: 0
+backlog size infeered = 16
+Begin emission:
+Finished sending 12 packets.
+
+Received 0 packets, got 0 answers, remaining 12 packets
+SYN packet sent
+Begin emission:
+Finished sending 6 packets.
+
+Received 6 packets, got 6 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55310 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65138 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55067 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54243 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64611 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53286 A
+Target alive
+
+*********2025-12-26 16:56:38,879 - INFO - Total canaries: 9, ACKs: 9,  SYN-ACKs: 0
+backlog size infeered = 24
+Begin emission:
+Finished sending 18 packets.
+
+Received 0 packets, got 0 answers, remaining 18 packets
+SYN packet sent
+Begin emission:
+Finished sending 9 packets.
+
+Received 9 packets, got 9 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53826 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52187 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49178 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57616 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56643 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60630 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55757 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61574 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57524 A
+Target alive
+
+**********2025-12-26 17:20:48,047 - INFO - Total canaries: 10, ACKs: 7,  SYN-ACKs: 3
+backlog size infeered = 26
+Begin emission:
+Finished sending 19 packets.
+
+Received 0 packets, got 0 answers, remaining 19 packets
+SYN packet sent
+Begin emission:
+Finished sending 10 packets.
+
+Received 10 packets, got 10 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64800 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50918 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58662 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57997 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49366 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63085 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60523 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58463 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62204 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51101 A
+Target not alive
+
+********2025-12-26 17:38:59,012 - INFO - Total canaries: 8, ACKs: 8,  SYN-ACKs: 0
+backlog size infeered = 22
+Begin emission:
+Finished sending 16 packets.
+
+Received 0 packets, got 0 answers, remaining 16 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61824 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50421 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53571 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62924 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60514 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53967 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53011 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54343 A
+Target alive
+
+***********2025-12-26 18:09:07,466 - INFO - Total canaries: 11, ACKs: 11,  SYN-ACKs: 0
+backlog size infeered = 30
+Begin emission:
+Finished sending 22 packets.
+
+Received 0 packets, got 0 answers, remaining 22 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 11 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57619 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59426 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62379 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49295 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60447 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64746 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52814 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64532 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55455 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51129 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63254 A
+Target alive
+
+**********2025-12-26 18:33:16,564 - INFO - Total canaries: 10, ACKs: 6,  SYN-ACKs: 4
+backlog size infeered = 26
+Begin emission:
+Finished sending 19 packets.
+
+Received 0 packets, got 0 answers, remaining 19 packets
+SYN packet sent
+Begin emission:
+Finished sending 10 packets.
+
+Received 10 packets, got 10 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49464 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61583 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63656 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62590 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53778 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49211 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50911 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60510 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65011 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64895 A
+Target not alive
+
+**********2025-12-26 18:58:56,002 - INFO - Total canaries: 10, ACKs: 7,  SYN-ACKs: 3
+backlog size infeered = 27
+Begin emission:
+Finished sending 20 packets.
+
+Received 0 packets, got 0 answers, remaining 20 packets
+SYN packet sent
+Begin emission:
+Finished sending 10 packets.
+
+Received 10 packets, got 10 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51282 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55959 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60417 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52199 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49910 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56961 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62716 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59104 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60985 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58056 A
+Target not alive
+
+****.******2025-12-26 19:24:35,166 - INFO - Total canaries: 10, ACKs: 3,  SYN-ACKs: 7
+backlog size infeered = 27
+Begin emission:
+Finished sending 20 packets.
+
+Received 0 packets, got 0 answers, remaining 20 packets
+SYN packet sent
+Begin emission:
+Finished sending 10 packets.
+
+Received 11 packets, got 10 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59742 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49415 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64909 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53477 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50671 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53327 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64849 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54811 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64437 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57188 A
+Target not alive
+
+******2025-12-26 19:33:50,447 - INFO - Total canaries: 6, ACKs: 6,  SYN-ACKs: 0
+backlog size infeered = 16
+Begin emission:
+Finished sending 12 packets.
+
+Received 0 packets, got 0 answers, remaining 12 packets
+SYN packet sent
+Begin emission:
+Finished sending 6 packets.
+
+Received 6 packets, got 6 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51163 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58670 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52292 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51320 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51648 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50352 A
+Target alive
+
+*************2025-12-26 20:09:59,022 - INFO - Total canaries: 13, ACKs: 11,  SYN-ACKs: 2
+backlog size infeered = 34
+Begin emission:
+Finished sending 25 packets.
+
+Received 0 packets, got 0 answers, remaining 25 packets
+SYN packet sent
+Begin emission:
+Finished sending 13 packets.
+
+Received 13 packets, got 13 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62044 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53696 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56533 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56523 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49488 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62011 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54402 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58626 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55030 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60513 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59142 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58378 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63376 SA
+Target not alive
+
+********2025-12-26 20:25:11,210 - INFO - Total canaries: 8, ACKs: 8,  SYN-ACKs: 0
+backlog size infeered = 20
+Begin emission:
+Finished sending 15 packets.
+
+Received 0 packets, got 0 answers, remaining 15 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63400 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58958 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56543 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57067 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56208 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57146 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65220 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56794 A
+Target alive
+
+**********2025-12-26 20:50:50,638 - INFO - Total canaries: 10, ACKs: 10,  SYN-ACKs: 0
+backlog size infeered = 27
+Begin emission:
+Finished sending 20 packets.
+
+Received 0 packets, got 0 answers, remaining 20 packets
+SYN packet sent
+Begin emission:
+Finished sending 10 packets.
+
+Received 10 packets, got 10 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49537 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59387 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49910 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49750 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56685 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64581 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60999 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60426 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62167 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64728 A
+Target alive
+
+***********2025-12-26 21:20:59,266 - INFO - Total canaries: 11, ACKs: 7,  SYN-ACKs: 4
+backlog size infeered = 30
+Begin emission:
+Finished sending 22 packets.
+
+Received 0 packets, got 0 answers, remaining 22 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 11 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64059 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65499 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64308 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56934 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62728 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63431 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55578 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63558 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57919 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53097 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64069 SA
+Target not alive
+
+*******2025-12-26 21:34:41,795 - INFO - Total canaries: 7, ACKs: 6,  SYN-ACKs: 1
+backlog size infeered = 19
+Begin emission:
+Finished sending 14 packets.
+
+Received 0 packets, got 0 answers, remaining 14 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55747 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64566 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52082 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52870 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64675 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56669 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61619 A
+Target not alive
+
+************2025-12-26 22:07:50,659 - INFO - Total canaries: 12, ACKs: 6,  SYN-ACKs: 6
+backlog size infeered = 32
+Begin emission:
+Finished sending 24 packets.
+
+Received 0 packets, got 0 answers, remaining 24 packets
+SYN packet sent
+Begin emission:
+Finished sending 12 packets.
+
+Received 12 packets, got 12 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64502 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50824 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60894 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59122 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49872 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63928 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63482 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61066 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53451 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62805 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56819 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59868 A
+Target not alive
+
+**********2025-12-26 22:33:29,566 - INFO - Total canaries: 10, ACKs: 10,  SYN-ACKs: 0
+backlog size infeered = 27
+Begin emission:
+Finished sending 20 packets.
+
+Received 0 packets, got 0 answers, remaining 20 packets
+SYN packet sent
+Begin emission:
+Finished sending 10 packets.
+
+Received 10 packets, got 10 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61446 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57632 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58210 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54569 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60078 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60339 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53232 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58983 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53035 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60976 A
+Target alive
+
+*******2025-12-26 22:47:12,314 - INFO - Total canaries: 7, ACKs: 7,  SYN-ACKs: 0
+backlog size infeered = 19
+Begin emission:
+Finished sending 14 packets.
+
+Received 0 packets, got 0 answers, remaining 14 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58602 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64455 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56858 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54107 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52653 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63671 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49940 A
+Target alive
+
+*******2025-12-26 23:00:54,748 - INFO - Total canaries: 7, ACKs: 7,  SYN-ACKs: 0
+backlog size infeered = 19
+Begin emission:
+Finished sending 14 packets.
+
+Received 0 packets, got 0 answers, remaining 14 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61312 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58467 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64329 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65276 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57583 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63816 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53540 A
+Target alive
+
+********2025-12-26 23:16:06,662 - INFO - Total canaries: 8, ACKs: 7,  SYN-ACKs: 1
+backlog size infeered = 20
+Begin emission:
+Finished sending 15 packets.
+
+Received 0 packets, got 0 answers, remaining 15 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60310 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57256 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57061 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58737 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50967 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63714 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62502 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59878 A
+Target not alive
+
+******2025-12-26 23:25:21,750 - INFO - Total canaries: 6, ACKs: 6,  SYN-ACKs: 0
+backlog size infeered = 16
+Begin emission:
+Finished sending 12 packets.
+
+Received 0 packets, got 0 answers, remaining 12 packets
+SYN packet sent
+Begin emission:
+Finished sending 6 packets.
+
+Received 6 packets, got 6 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56880 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62407 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53242 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53060 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65316 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51039 A
+Target alive
+
+*********2025-12-26 23:46:31,590 - INFO - Total canaries: 9, ACKs: 5,  SYN-ACKs: 4
+backlog size infeered = 24
+Begin emission:
+Finished sending 18 packets.
+
+Received 0 packets, got 0 answers, remaining 18 packets
+SYN packet sent
+Begin emission:
+Finished sending 9 packets.
+
+Received 9 packets, got 9 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54624 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63313 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53237 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52211 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54710 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58237 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53963 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49256 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50000 A
+Target not alive
+
+*******2025-12-27 00:00:14,311 - INFO - Total canaries: 7, ACKs: 7,  SYN-ACKs: 0
+backlog size infeered = 19
+Begin emission:
+Finished sending 14 packets.
+
+Received 0 packets, got 0 answers, remaining 14 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53112 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56487 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61318 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63961 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57859 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59666 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65010 A
+Target alive
+
+***********2025-12-27 00:30:23,274 - INFO - Total canaries: 11, ACKs: 11,  SYN-ACKs: 0
+backlog size infeered = 30
+Begin emission:
+Finished sending 22 packets.
+
+Received 0 packets, got 0 answers, remaining 22 packets
+SYN packet sent
+Begin emission:
+Finished sending 11 packets.
+
+Received 11 packets, got 11 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52190 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65371 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60271 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64632 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64850 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63507 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60362 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53763 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54142 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55197 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54911 A
+Target alive
+
+*************2025-12-27 01:06:32,426 - INFO - Total canaries: 13, ACKs: 9,  SYN-ACKs: 4
+backlog size infeered = 34
+Begin emission:
+Finished sending 25 packets.
+
+Received 0 packets, got 0 answers, remaining 25 packets
+SYN packet sent
+Begin emission:
+Finished sending 13 packets.
+
+Received 13 packets, got 13 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54351 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53672 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50423 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54619 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51632 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65035 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62894 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60929 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:62174 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:65060 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60602 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:63009 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58804 A
+Target not alive
+
+*******2025-12-27 01:18:45,766 - INFO - Total canaries: 7, ACKs: 7,  SYN-ACKs: 0
+backlog size infeered = 18
+Begin emission:
+Finished sending 13 packets.
+
+Received 0 packets, got 0 answers, remaining 13 packets
+SYN packet sent
+Begin emission:
+Finished sending 7 packets.
+
+Received 7 packets, got 7 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58785 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55547 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60189 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49408 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57602 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60202 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57231 A
+Target alive
+
+********2025-12-27 01:36:56,554 - INFO - Total canaries: 8, ACKs: 8,  SYN-ACKs: 0
+backlog size infeered = 22
+Begin emission:
+Finished sending 16 packets.
+
+Received 0 packets, got 0 answers, remaining 16 packets
+SYN packet sent
+Begin emission:
+Finished sending 8 packets.
+
+Received 8 packets, got 8 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51317 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60820 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52871 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64138 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53564 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53730 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54129 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56868 A
+Target alive
+
+*************2025-12-27 02:13:05,363 - INFO - Total canaries: 13, ACKs: 6,  SYN-ACKs: 7
+backlog size infeered = 34
+Begin emission:
+Finished sending 25 packets.
+
+Received 0 packets, got 0 answers, remaining 25 packets
+SYN packet sent
+Begin emission:
+Finished sending 13 packets.
+
+Received 13 packets, got 13 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61925 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64749 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57607 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:50873 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:59040 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:56335 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61437 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54684 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:55739 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54914 SA
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:60429 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54242 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61531 A
+Target not alive
+
+*************2025-12-27 02:49:13,558 - INFO - Total canaries: 13, ACKs: 13,  SYN-ACKs: 0
+backlog size infeered = 34
+Begin emission:
+Finished sending 25 packets.
+
+Received 0 packets, got 0 answers, remaining 25 packets
+SYN packet sent
+Begin emission:
+Finished sending 13 packets.
+
+Received 13 packets, got 13 answers, remaining 0 packets
+Probes sent
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61716 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:58415 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57751 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:49258 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:52272 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64481 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:61972 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:54434 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53492 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:51003 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:57261 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:53381 A
+IP / TCP 192.168.4.100:8094 > 192.168.20.100:64168 A
+Target alive
+
