@@ -207,4 +207,8 @@ uname -r
 ```bash
 # Conteggio connessioni in stato SYN-RECV per una porta specifica (es. 8084)
 ss -ant | grep SYN-RECV | grep :8084 | wc -l
+
+# Ignorare gli update alla cartella Vagrant/zombie_files/kernel/, così git non deve gestirsi migliaia di cambiamenti ogni compilazione
+git update-index --assume-unchanged Vagrant/zombie_files/kernel/
 ```
+
