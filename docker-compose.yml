@@ -3,6 +3,7 @@ services:
     build: .
     container_name: original-syn-vagrant
     privileged: true
+    network_mode: host
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - /dev/kvm:/dev/kvm

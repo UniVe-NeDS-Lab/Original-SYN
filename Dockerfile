@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     libvirt-dev \
     zlib1g-dev \
     ruby-dev \
+    kmod \
     && rm -rf /var/lib/apt/lists/*
 
 # Add HashiCorp repository and install Vagrant
