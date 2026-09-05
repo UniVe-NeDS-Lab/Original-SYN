@@ -93,8 +93,8 @@ else
     make -j$(nproc)
 fi
 
-echo "[*] Installing modules and kernel..."
-sudo make modules_install
-sudo make install
+echo "=== Custom Kernel Built Successfully ==="
+echo "In order to install it on a VM, move it and run"
+echo "sudo make modules_install"
+echo "sudo make install"
 
-echo "=== Custom Kernel Setup Completed Successfully ==="
