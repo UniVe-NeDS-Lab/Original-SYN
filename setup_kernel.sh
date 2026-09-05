@@ -26,7 +26,8 @@ sudo apt-get update && sudo apt-get install -y \
     elfutils \
     libaudit-dev \
     libcap-dev \
-    libcap-ng-dev
+    libcap-ng-dev \
+    kmod
 
 # Navigate to kernel source directory if available, or download if needed
 # (Assuming kernel source is located in zombie_files/kernel or similar based on tree)
@@ -55,12 +56,16 @@ else
     fi
 fi
 
-echo "[*] Configuring kernel..."
-if [ -f "/boot/config-$(uname -r)" ]; then
-    cp -v /boot/config-$(uname -r) .config
+echo "[*] Configuring kernel non-interactively..."
+
+# If an existing .config is already present in the kernel source tree, preserve and reuse it.
+# Otherwise, copy from /boot or /proc or fall back to defconfig.
+if [ -f ".config" ]; then
+    echo "[*] Existing .config found in kernel source tree, preserving and reusing it..."
 else
-    echo "[!] /boot/config-$(uname -r) not found, attempting to use /proc/config.gz if available..."
-    if [ -f /proc/config.gz ]; then
+    if [ -f "/boot/config-$(uname -r)" ]; then
+        cp -v /boot/config-$(uname -r) .config
+    elif [ -f /proc/config.gz ]; then
         zcat /proc/config.gz > .config
     else
         echo "[!] No existing kernel config found. Running make defconfig..."
@@ -68,8 +73,10 @@ else
     fi
 fi
 
-# Generazione configurazione locale ridotta
-yes '' | make localmodconfig || echo "[!] localmodconfig warning encountered, continuing..."
+# Use make olddefconfig to handle any new config symbols non-interactively with default answers
+# instead of make localmodconfig which relies on host lsmod and prompts for new options interactively.
+export KCONFIG_NOTIMEOUT=1
+yes '' | make olddefconfig || echo "[!] olddefconfig warning encountered, continuing..."
 
 # Disabilitazione chiavi fidate e info di debug non necessarie
 scripts/config --disable SYSTEM_TRUSTED_KEYS || true
@@ -81,6 +88,9 @@ scripts/config --enable DEBUG_INFO_NONE || true
 scripts/config --enable CONFIG_INET_DIAG || true
 scripts/config --enable CONFIG_INET_TCP_DIAG || true
 scripts/config --enable CONFIG_NETLINK_DIAG || true
+
+# Run olddefconfig again to cleanly apply changes non-interactively
+yes '' | make olddefconfig || true
 
 echo "[*] Compiling kernel -j$(nproc)... (NOTE: Must be run as non-root user)"
 # Ensure we are not running as root for make, or use appropriate handling
