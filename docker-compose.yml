@@ -1,0 +1,15 @@
+services:
+  vagrant-vm:
+    build: .
+    container_name: original-syn-vagrant
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /dev/kvm:/dev/kvm
+      - /var/run/libvirt:/var/run/libvirt
+      - .:/workspace
+    environment:
+      - container=docker
+    command: ["tail", "-f", "/dev/null"] # sleepy
+    stdin_open: true
+    tty: true
