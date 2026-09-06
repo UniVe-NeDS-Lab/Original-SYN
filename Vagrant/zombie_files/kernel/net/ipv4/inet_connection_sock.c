@@ -1162,8 +1162,14 @@ static void reqsk_timer_handler(struct timer_list *t)
 	 */
 
 
-	 
+
 	// Custom Davide
+
+	// L'idea di base del codice seguente è di abbassare la threshold nel range mostrato come asii art
+	// 0            3/8B                                6/8B+1         B
+	// |-------------|===================================|-------------|
+	// [             | Nuovo valore threshold qui dentro |             |
+	// |-------------|===================================|-------------|
 
 	spin_lock_irqsave(&icsk->backlog_update_lock, icsk->flags); // acquisisci lock sempre facendo una sorta di "busy wait"
 
