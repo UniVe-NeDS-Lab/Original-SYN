@@ -2,6 +2,11 @@
 
 Repository per la riproduzione dell'attacco side-channel con SYN, la gestione delle relative mitigazioni e la compilazione personalizzata del Kernel Linux.
 
+Alcuni file di interesse possono essere:
+- `Vagrant/attack_files/repeated_test_part2/run.sh` per lo script che fa partire i test
+- `Vagrant/zombie_files/kernel/net/ipv4/inet_connection_sock.c` per le parti del kernel effettivamente modificate, le quali sono racchiuse nei commenti "Custom Davide"
+- `Vagrant/zombie_files/kernel/include/net/inet_connection_sock.h` per gli header modificati del file precedente
+
 ---
 
 ## 1. Setup e Gestione Vagrant
