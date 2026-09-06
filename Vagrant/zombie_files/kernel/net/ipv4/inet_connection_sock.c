@@ -1161,6 +1161,8 @@ static void reqsk_timer_handler(struct timer_list *t)
 	 * ones are about to clog our table.
 	 */
 
+
+	 
 	// Custom Davide
 
 	spin_lock_irqsave(&icsk->backlog_update_lock, icsk->flags); // acquisisci lock sempre facendo una sorta di "busy wait"
@@ -1190,29 +1192,33 @@ static void reqsk_timer_handler(struct timer_list *t)
 
 	spin_unlock_irqrestore(&icsk->backlog_update_lock, icsk->flags); // release dello spinlock
 
-    // End Custom Davide
+
+    queue = &icsk->icsk_accept_queue;
+    qlen = reqsk_queue_len(queue);
+
+	// La logica originale commentata prevedeva di comparare qlen*2 rispetto al massimo, 
+	// mentre ora compariamo qlen direttamente con la threshold custom (notare che sia 
+	// equivalente a qlen*2 +/- un certo range)
+    // if ((qlen << 1) > max(8U, READ_ONCE(icsk->sk_max_ack_backlog_custom))) {
+    if (qlen >= max(8U, READ_ONCE(icsk->sk_max_ack_backlog_custom))) {
+      	int young = reqsk_queue_len_young(queue) << 1;
+
+        // pr_info("qlen: %d, backlog_threshold_evinction: %d\n", qlen,
+        // req->backlog_threshold_evinction);
+
+	// End Custom Davide
 
 
-	queue = &icsk->icsk_accept_queue;
-	qlen = reqsk_queue_len(queue);
-	//if ((qlen << 1) > max(8U, READ_ONCE(icsk->sk_max_ack_backlog_custom))){
-        if (qlen >= max(8U, READ_ONCE(icsk->sk_max_ack_backlog_custom))){
-		int young = reqsk_queue_len_young(queue) << 1;
-
-
-		//pr_info("qlen: %d, backlog_threshold_evinction: %d\n", qlen, req->backlog_threshold_evinction);
 
 		while (max_syn_ack_retries > 2) {
 			if (qlen < young)
-				break;
+			break;
 			max_syn_ack_retries--;
 			young <<= 1;
 		}
+    }
 
-
-	}
-	syn_ack_recalc(req, max_syn_ack_retries, READ_ONCE(queue->rskq_defer_accept),
-		       &expire, &resend);
+    syn_ack_recalc(req, max_syn_ack_retries, READ_ONCE(queue->rskq_defer_accept), &expire, &resend);
 
 	if(expire)
 		pr_info("req Expired\n");
@@ -1424,14 +1430,15 @@ int inet_csk_listen_start(struct sock *sk)
 	sk->sk_ack_backlog = 0;
 	inet_csk_delack_init(sk);
 
-        /* Custom Davide
 
-        icsk->sk_max_ack_backlog_custom_updater = 1;
-        icsk->sk_max_ack_backlog_custom = U32_MAX;
+    /* Custom Davide
 
-        pr_info("sk_max_ack_backlog_custom_updater initialized, value= %D\n", icsk->sk_max_ack_backlog_custom_updater);
+    icsk->sk_max_ack_backlog_custom_updater = 1;
+    icsk->sk_max_ack_backlog_custom = U32_MAX;
 
-        // End custom Davide*/
+    pr_info("sk_max_ack_backlog_custom_updater initialized, value= %D\n", icsk->sk_max_ack_backlog_custom_updater);
+
+    // End custom Davide */
 
 
 	/* There is race window here: we announce ourselves listening,
