@@ -63,6 +63,32 @@ Vagrant.configure("2") do |config|
       sudo ip route add 192.168.5.0/24 via 192.168.4.254
       
       echo "Rotte statiche configurate"
+      echo ""
+
+      # Creazione servizio systemd per l'avvio dei servizi
+    cat > /etc/systemd/system/zombie-compile.service <<'EOF'
+[Unit]
+Description=Zombie kernel compile and test
+Wants=network-online.target
+After=network-online.target
+After=systemd-networkd-wait-online.service
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/home/vagrant/zombie_files/test_backlog
+ExecStart=/home/vagrant/zombie_files/test_backlog/compile_run.sh
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # Ricarica systemd e abilita il servizio al boot
+    systemctl daemon-reload
+    systemctl enable zombie-compile.service
+
+    echo "Servizio zombie-compile.service configurato"
 
       #echo "Compilazione kernel completata, procedere con il reboot della macchina"
 

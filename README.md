@@ -168,9 +168,12 @@ cd Vagrant
 vagrant up --provider=libvirt
 ```
 
-Esecuzione dello script di configurazione del Kernel personalizzato:
+
+**Solamente nel caso in cui i servizi sulla VM zombie non fossero partiti,** eseguire i comandi riportati qui sotto
 ```bash
-./setup_kernel.sh
+vagrant ssh zombie
+cd zombie_files/test_backlog
+./compile_run.sh
 ```
 
 ### Installazione del Kernel Personalizzato
@@ -182,9 +185,10 @@ Dato che il kernel compilato deve essere installato e avviato all'interno della 
 vagrant ssh zombie
 ```
 
-2. Vai nella cartella con il kernel compilato/copialo
+2. Vai nella cartella con il kernel e compilalo con lo script
 ```bash
-cd /path/to/kernel/source
+cd zombie_files/kernel/
+./setup_kernel.sh
 ```
 
 3. Installa il kernel e riavvia
@@ -201,6 +205,17 @@ vagrant ssh zombie
 uname -r
 ```
 
+## 6. Eseguire i Test
+
+Prima di eseguire i test:
+- configura Vagrant come descritto precedentemente (quindi anche il kernel sullo zombie, se necessario)
+- usano o meno il kernel modificato, in base al test da fare
+
+Per eseguire l'intera serie di test si può usare il seguente script:
+```bash
+cd /home/vagrant/attack_files/repeted_test_part2
+./run.sh
+```
 
 ## 5. Altri comandi utili
 
