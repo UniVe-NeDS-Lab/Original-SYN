@@ -139,13 +139,13 @@ struct inet_connection_sock {
 
 	u64			  icsk_ca_priv[104 / sizeof(u64)];
 
-	//custom Davide
-        u32                     sk_max_ack_backlog_custom;
-	int 			sk_max_ack_backlog_custom_updater;
-	spinlock_t 		backlog_update_lock;
-	unsigned long		flags;
-	unsigned long 		last_token_update_jiffies;
-	//end Custom Davide
+	// Custom Davide
+    u32                 sk_max_ack_backlog_custom; // threshold custom randomizzata (sostituisce sk_max_ack_backlog)
+	int 			    sk_max_ack_backlog_custom_updater; // flag per l'aggiornamento della threshold (0 = aggiornata, 1 = aggiornamento richiesto (interval check), 2 = update forzato)
+	spinlock_t 		    backlog_update_lock; // lock per la gestione della concorrenza nel ricalcolo della threshold 
+	unsigned long		flags; // salva le flag per backlog_update_lock
+	unsigned long 		last_token_update_jiffies; // salvataggio timestamp in jiffies del calcolo dell'ultima threshold
+	// End Custom Davide
 
 #define ICSK_CA_PRIV_SIZE	  sizeof_field(struct inet_connection_sock, icsk_ca_priv)
 };

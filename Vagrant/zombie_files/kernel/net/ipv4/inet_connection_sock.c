@@ -22,11 +22,11 @@
 #include <net/tcp.h>
 #include <net/sock_reuseport.h>
 #include <net/addrconf.h>
-//Custom Davide
-#include <net/service_tracker.h>
 
-#define TOKEN_UPDATE_INTERVAL (60 * HZ)
-//fine custom Davide
+// Custom Davide
+#include <net/service_tracker.h>
+#define TOKEN_UPDATE_INTERVAL (60 * HZ) // intervallo fra ogni aggiornamento della flag (ora come ora ogni 60 secondi)
+// End Custom Davide
 
 
 #if IS_ENABLED(CONFIG_IPV6)
@@ -898,26 +898,24 @@ static void syn_ack_recalc(struct request_sock *req,
 		*expire = req->num_timeout >= max_syn_ack_retries;
 		*resend = 1;
 
-		//Custom Davide
-		struct sock *sk_listener = req->rsk_listener;
+		// Custom Davide
+		struct sock *sk_listener = req->rsk_listener; // ottieni il socket associato alla richiesta
 
-		if(*expire){
+		if(*expire){ // se la richiesta è andata in timeout
 			struct inet_connection_sock *icsk = inet_csk(sk_listener);
-		        struct net *net = sock_net(sk_listener);
-			//unsigned long flags;
+		    struct net *net = sock_net(sk_listener);
 
-			spin_lock_irqsave(&icsk->backlog_update_lock, icsk->flags);
+			spin_lock_irqsave(&icsk->backlog_update_lock, icsk->flags); // "busy wait" per ottenere il lock + interrupt bloccati
 
-		        if(req->num_timeout < READ_ONCE(net->ipv4.sysctl_tcp_synack_retries) && 
-        		        !icsk->sk_max_ack_backlog_custom_updater){
-
-				icsk->sk_max_ack_backlog_custom_updater = 1;
-				icsk->last_token_update_jiffies = jiffies;
-        	        	pr_info("CustomDavide: reset updater after overload eviction\n");
+		        if(req->num_timeout < READ_ONCE(net->ipv4.sysctl_tcp_synack_retries) &&  // se siamo entro il limite di SYN-ACK 
+        		        !icsk->sk_max_ack_backlog_custom_updater) {                      // e un'update non è richiesto
+					icsk->sk_max_ack_backlog_custom_updater = 1; // segna che è necessario un'update
+					icsk->last_token_update_jiffies = jiffies;   // segna il timestamp corrente
+        	        pr_info("CustomDavide: reset updater after overload eviction\n");
 	        	}
-			spin_unlock_irqrestore(&icsk->backlog_update_lock, icsk->flags);
+			spin_unlock_irqrestore(&icsk->backlog_update_lock, icsk->flags); // release dello spinlock
 		}
-		//end Custom Davide
+		// End Custom Davide
 		return;
 	}
 	*expire = req->num_timeout >= max_syn_ack_retries &&
@@ -1163,36 +1161,37 @@ static void reqsk_timer_handler(struct timer_list *t)
 	 * ones are about to clog our table.
 	 */
 
-	//Custom Davide
+	// Custom Davide
 
-	spin_lock_irqsave(&icsk->backlog_update_lock, icsk->flags);
+	spin_lock_irqsave(&icsk->backlog_update_lock, icsk->flags); // acquisisci lock sempre facendo una sorta di "busy wait"
 
-	unsigned long now = jiffies;
+	unsigned long now = jiffies; // timestap attuale in jiffies
 
-	if(icsk->sk_max_ack_backlog_custom_updater == 2 || (icsk->sk_max_ack_backlog_custom_updater == 1 &&
-	time_after(now, icsk->last_token_update_jiffies + TOKEN_UPDATE_INTERVAL))){
-		int backlog_size = READ_ONCE(sk_listener->sk_max_ack_backlog);
-                int base_threshold = backlog_size * 3 / 8;
-                int window = (backlog_size * 6 / 8) - base_threshold;
-                int random_backlog;
+	if(icsk->sk_max_ack_backlog_custom_updater == 2 || (icsk->sk_max_ack_backlog_custom_updater == 1 && // se un'update forzato o uno normale +
+		time_after(now, icsk->last_token_update_jiffies + TOKEN_UPDATE_INTERVAL))) {                    // 60 secondi sono passati
+		int backlog_size = READ_ONCE(sk_listener->sk_max_ack_backlog); // leggi il backlog limit massimo del socket in ascolto
+        int base_threshold = backlog_size * 3 / 8;            // calcola il lower bound della threshold (3/8)
+        int window = (backlog_size * 6 / 8) - base_threshold; // definisci la dimensione massima della finestra (fino a 6/8) come offset da base_threshold
+        
+		int random_backlog;
 		u32 token;
+		get_random_bytes(&token, sizeof(u32)); // nuovo offset della threshold custom all'interno della window
+        random_backlog = token % (window + 2); // limitazione effettiva dell'offset all'interno della window
+        
+		if (random_backlog < 0) // rendiamo il numero positivo
+            random_backlog = -random_backlog;
 
-		get_random_bytes(&token, sizeof(u32));
+        random_backlog = base_threshold + random_backlog; // aggiungiamo alla base minima della threshold l'offset prima calcolato
 
-                random_backlog = token % (window + 2);
-                if (random_backlog < 0)
-                        random_backlog = -random_backlog;
-
-                random_backlog = random_backlog + base_threshold;
-
-		icsk->sk_max_ack_backlog_custom = (u32)random_backlog;
-		icsk->sk_max_ack_backlog_custom_updater = 0;
+		icsk->sk_max_ack_backlog_custom = (u32)random_backlog; // salviamo la nuova threshold
+		icsk->sk_max_ack_backlog_custom_updater = 0; // resettiamo la richiesta di update
 		pr_info("icsk->sk_max_ack_backlog_custom: %d\n", icsk->sk_max_ack_backlog_custom);
 	}
 
-	spin_unlock_irqrestore(&icsk->backlog_update_lock, icsk->flags);
+	spin_unlock_irqrestore(&icsk->backlog_update_lock, icsk->flags); // release dello spinlock
 
-        //fine Custom Davide*/
+    // End Custom Davide
+
 
 	queue = &icsk->icsk_accept_queue;
 	qlen = reqsk_queue_len(queue);
@@ -1425,14 +1424,14 @@ int inet_csk_listen_start(struct sock *sk)
 	sk->sk_ack_backlog = 0;
 	inet_csk_delack_init(sk);
 
-        /*custom Davide
+        /* Custom Davide
 
         icsk->sk_max_ack_backlog_custom_updater = 1;
         icsk->sk_max_ack_backlog_custom = U32_MAX;
 
         pr_info("sk_max_ack_backlog_custom_updater initialized, value= %D\n", icsk->sk_max_ack_backlog_custom_updater);
 
-        //end custom Davide*/
+        // End custom Davide*/
 
 
 	/* There is race window here: we announce ourselves listening,
