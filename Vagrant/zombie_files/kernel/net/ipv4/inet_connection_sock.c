@@ -23,6 +23,14 @@
 #include <net/sock_reuseport.h>
 #include <net/addrconf.h>
 
+// Custom Luca
+
+extern int sysctl_tcp_syn_backlog_lower_bound_factor;
+extern int sysctl_tcp_syn_backlog_upper_bound_factor;
+
+// End Custom Luca
+
+
 // Custom Davide
 #include <net/service_tracker.h>
 #define TOKEN_UPDATE_INTERVAL (60 * HZ) // intervallo fra ogni aggiornamento della flag (ora come ora ogni 60 secondi)
@@ -1178,8 +1186,8 @@ static void reqsk_timer_handler(struct timer_list *t)
 	if(icsk->sk_max_ack_backlog_custom_updater == 2 || (icsk->sk_max_ack_backlog_custom_updater == 1 && // se un'update forzato o uno normale +
 		time_after(now, icsk->last_token_update_jiffies + TOKEN_UPDATE_INTERVAL))) {                    // 60 secondi sono passati
 		int backlog_size = READ_ONCE(sk_listener->sk_max_ack_backlog); // leggi il backlog limit massimo del socket in ascolto
-        int base_threshold = backlog_size * 3 / 8;            // calcola il lower bound della threshold (3/8)
-        int window = (backlog_size * 6 / 8) - base_threshold; // definisci la dimensione massima della finestra (fino a 6/8) come offset da base_threshold
+        int base_threshold = backlog_size * sysctl_tcp_syn_backlog_lower_bound_factor / 8;            // calcola il lower bound della threshold (default 3/8)
+        int window = (backlog_size * sysctl_tcp_syn_backlog_upper_bound_factor / 8) - base_threshold; // definisci la dimensione massima della finestra (default fino a 6/8) come offset da base_threshold
         
 		int random_backlog;
 		u32 token;

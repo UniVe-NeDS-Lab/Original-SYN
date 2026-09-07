@@ -20,6 +20,15 @@
 #include <net/protocol.h>
 #include <net/netevent.h>
 
+// Custom Luca
+
+int sysctl_tcp_syn_backlog_lower_bound_factor = 3;
+EXPORT_SYMBOL(sysctl_tcp_syn_backlog_lower_bound_factor);
+int sysctl_tcp_syn_backlog_upper_bound_factor = 6;
+EXPORT_SYMBOL(sysctl_tcp_syn_backlog_upper_bound_factor);
+
+// End Custom Luca
+
 static int tcp_retr1_max = 255;
 static int ip_local_port_range_min[] = { 1, 1 };
 static int ip_local_port_range_max[] = { 65535, 65535 };
@@ -44,6 +53,12 @@ static u32 fib_multipath_hash_fields_all_mask __maybe_unused =
 static unsigned int tcp_child_ehash_entries_max = 16 * 1024 * 1024;
 static unsigned int udp_child_hash_entries_max = UDP_HTABLE_SIZE_MAX;
 static int tcp_plb_max_rounds = 31;
+
+// Custom Luca
+static int tcp_syn_backlog_lower_bound_max = 3;
+static int tcp_syn_backlog_upper_bound_max = 6;
+// End Custom Luca
+
 static int tcp_plb_max_cong_thresh = 256;
 
 /* obsolete */
@@ -1322,6 +1337,30 @@ static struct ctl_table ipv4_net_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec
 	},
+
+// Custom Luca
+
+	{
+		.procname	= "tcp_syn_backlog_lower_bound_factor",
+		.data		= &sysctl_tcp_syn_backlog_lower_bound_factor,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= SYSCTL_ONE,
+		.extra2		= &tcp_syn_backlog_lower_bound_max,
+	},
+	{
+		.procname	= "tcp_syn_backlog_upper_bound_factor",
+		.data		= &sysctl_tcp_syn_backlog_upper_bound_factor,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= SYSCTL_ONE,
+		.extra2		= &tcp_syn_backlog_upper_bound_max,
+	},
+
+// End Custom Luca
+
 	{
 		.procname	= "tcp_challenge_ack_limit",
 		.data		= &init_net.ipv4.sysctl_tcp_challenge_ack_limit,

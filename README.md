@@ -148,6 +148,24 @@ sudo reboot
 > 
 > 
 
+### Cambiare i limiti della window
+
+Per cambiare i setting della scelta della nuova dimensione della window, si può usare i comandi seguenti.
+
+Per vedere i limiti correnti:
+```bash
+sysctl net.ipv4.tcp_syn_backlog_lower_bound_factor
+sysctl net.ipv4.tcp_syn_backlog_upper_bound_factor
+```
+
+Per cambiare i valori:
+```bash
+sysctl -w net.ipv4.tcp_syn_backlog_lower_bound_factor=<value>
+sysctl -w net.ipv4.tcp_syn_backlog_upper_bound_factor=<value>
+```
+
+Reminder che di default i valori sono `3` e `6`, i quali sono divisi per `8`  (quindi `3/8` e `6/8`) e vanno mantenuti sotto l'`1`.
+
 ---
 
 ## 4. Setup e Esecuzione con Docker Compose e Vagrant
