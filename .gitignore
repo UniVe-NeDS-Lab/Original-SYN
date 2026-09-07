@@ -2,3 +2,5 @@
 
 Vagrant/zombie_files/kernel
 Vagrant/.vagrant/
+
+Vagrant/attack_files/__pycache__
