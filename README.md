@@ -212,8 +212,10 @@ vagrant ssh zombie
 2. Vai nella cartella con il kernel e compilalo con lo script
 ```bash
 cd zombie_files/kernel/
-./setup_kernel.sh
+./compile_kernel.sh
 ```
+
+> **Nota:** si può fare la stessa cosa anche direttamente dal contaienr usando lo script `setup_kernel.sh` (quest'ultimo installa anche le dipendenze necessarie)
 
 3. Installa il kernel e riavvia
 ```bash
