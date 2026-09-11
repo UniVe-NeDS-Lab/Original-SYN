@@ -176,6 +176,7 @@ Questo repository include una configurazione docker compose per avviare l'ambien
 ### Avvio dello Stack Docker Compose
 Per buildare e avviare il container in background:
 ```bash
+cd Testing\ Tools
 docker compose up -d --build
 ```
 
