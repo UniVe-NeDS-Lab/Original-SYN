@@ -15,11 +15,18 @@ def calculate_default_limits(backlog_size):
 def calculate_probabilities(backlog_size, t_min=None, t_max=None):
     """
     Calculate the probabilities of false positives, false negatives,
-    true positives and true negatives based on the given backlog size
+    true positives and true negatives based on the given backlog size.
+    Allows specifying either or both t_min and t_max limits.
     """
-    # T_min and T_max
-    if t_min is None or t_max is None:
-        t_min, t_max = calculate_default_limits(backlog_size)
+    # T_min and T_max defaults if not provided
+    default_t_min, default_t_max = calculate_default_limits(backlog_size)
+    if t_min is None:
+        t_min = default_t_min
+    if t_max is None:
+        t_max = default_t_max
+
+    if t_max < t_min:
+        return None
 
     # window size
     w_b = t_max - t_min + 1
@@ -38,11 +45,25 @@ def calculate_probabilities(backlog_size, t_min=None, t_max=None):
     start_w = math.floor(3 / 4 * backlog_size)
     for w in range(start_w, t_max + 1):
         n_fn += 1 / 2 * w - t_min + 1
-    n_fn = math.floor(n_fn)
+    n_fn = math.ceil(n_fn)
 
     # occurrences of true positives and true negatives
     n_tp = total_sample_space - n_fn
     n_tn = total_sample_space - n_fp
+
+    # validate occurrences (must be within 0 and total_sample_space)
+    if (
+        n_fp < 0
+        or n_fn < 0
+        or n_tp < 0
+        or n_tn < 0
+        or n_fp > total_sample_space
+        or n_fn > total_sample_space
+        or n_tp > total_sample_space
+        or n_tn > total_sample_space
+    ):
+        return None
+
 
     # probabilities
     p_fp = n_fp / total_sample_space
@@ -67,19 +88,28 @@ def calculate_probabilities(backlog_size, t_min=None, t_max=None):
     }
 
 
-def sweep_window_sizes(backlog_size):
+def sweep_window_sizes(backlog_size, t_min=None, t_max=None):
     """
-    Sweep across all possible T_min-T_max combinations for the window
-    size and return the values that make the 4 probabilities as close
-    to 0.5 as possible
+    Sweep across possible T_min-T_max combinations for the window
+    size (fixing t_min and/or t_max if specified) and return the values that
+    make the 4 probabilities as close to 0.5 as possible
     """
     best_result = None
     best_score = float("inf")
 
+    t_min_range = [t_min] if t_min is not None else range(0, backlog_size + 1)
+
     # for all possible combinations
-    for t_min in range(0, backlog_size + 1):
-        for t_max in range(t_min + 1, backlog_size + 1):
-            result = calculate_probabilities(backlog_size, t_min=t_min, t_max=t_max)
+    for tm in t_min_range:
+        t_max_range = (
+            [t_max] if t_max is not None else range(tm + 1, backlog_size + 1)
+        )
+        for tx in t_max_range:
+            if tx <= tm:
+                continue
+            result = calculate_probabilities(backlog_size, t_min=tm, t_max=tx)
+            if result is None:
+                continue
             probabilities = [
                 result["p_fp"],
                 result["p_fn"],
@@ -92,6 +122,9 @@ def sweep_window_sizes(backlog_size):
             if score < best_score:
                 best_score = score
                 best_result = result.copy()
+
+    if best_result is None:
+        return None
 
     best_result["score"] = best_score
 
@@ -113,12 +146,13 @@ def sweep_window_sizes(backlog_size):
 def plot_probabilities(max_backlog_size, sweep=False, t_min=None, t_max=None):
     """
     Works with 2 modes:
-    - regular mode: calculate the probabilities with the given (or not)
+    - regular mode: calculate the probabilities with the given (or partial/default)
                     window limits and plot the result. When not given, the
                     limits will be calculated on the fly with the
                     usual proportions
     - sweep mode: sweeps through the backlog sizes from 1 to max_backlog_size,
-                  calculate the best score for each and plot the result
+                  calculating the best score for each (respecting fixed limits if given) 
+                  and plotting the result
     """
     start_size = 1
 
@@ -129,36 +163,45 @@ def plot_probabilities(max_backlog_size, sweep=False, t_min=None, t_max=None):
         start_size = t_max
 
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
+    valid_sizes = []
     p_tps, p_tns, p_fps, p_fns = [], [], [], []
 
     for size in backlog_sizes:
         if sweep:
-            res = sweep_window_sizes(size)
+            res = sweep_window_sizes(size, t_min=t_min, t_max=t_max)
         else:
-            res = calculate_probabilities(size, t_min, t_max)
+            res = calculate_probabilities(size, t_min=t_min, t_max=t_max)
 
+        if res is None:
+            continue
+
+        valid_sizes.append(size)
         p_tps.append(res["p_tp"])
         p_tns.append(res["p_tn"])
         p_fps.append(res["p_fp"])
         p_fns.append(res["p_fn"])
 
+    if not valid_sizes:
+        print("No valid parameter ranges to plot")
+        return
+
     plt.figure(figsize=(10, 6))
     plt.plot(
-        backlog_sizes,
+        valid_sizes,
         p_tps,
         label="True Positives P(TP)",
         color="green",
         linewidth=2,
     )
     plt.plot(
-        backlog_sizes,
+        valid_sizes,
         p_tns,
         label="True Negatives P(TN)",
         color="blue",
         linewidth=2,
     )
     plt.plot(
-        backlog_sizes,
+        valid_sizes,
         p_fps,
         label="False Positives P(FP)",
         color="orange",
@@ -166,7 +209,7 @@ def plot_probabilities(max_backlog_size, sweep=False, t_min=None, t_max=None):
         linestyle="--",
     )
     plt.plot(
-        backlog_sizes,
+        valid_sizes,
         p_fns,
         label="False Negatives P(FN)",
         color="red",
@@ -194,6 +237,10 @@ def plot_probabilities(max_backlog_size, sweep=False, t_min=None, t_max=None):
 
 
 def print_results(results, title="Calculation Results"):
+    if not results:
+        print("No valid results found!")
+        return
+
     print(f"--- {title} ---")
     print(f"Backlog Size: {results['backlog_size']}")
     print(f"T_min: {results['T_min']}")
@@ -253,16 +300,18 @@ Examples:
   \033[1;36m1. Calculate the probabilities and t_min/t_max limits automatically\033[0m
      python3 probability_calculator.py 32
 
-  \033[1;36m2. Calculate the probabilities with specified t_min/t_max limits\033[0m
+  \033[1;36m2. Calculate the probabilities with one or more specified t_min/t_max limits\033[0m
      python3 probability_calculator.py 64 --t_min 10 --t_max 40
+     python3 probability_calculator.py 64 --t_min 10
 
-  \033[1;36m3. Calculate the best possible limits for the given backlog size, then print the found limits and probabilities\033[0m
+  \033[1;36m3. Calculate the best possible limits (optionally fixing one) for the given backlog size\033[0m
      python3 probability_calculator.py 128 --sweep
+     python3 probability_calculator.py 128 --sweep --t_min 10
 
   \033[1;36m4. Plot the backlog sizes from 1 to 32 with dynamically calculated limits based on each backlog size\033[0m
      python3 probability_calculator.py 32 --plot
 
-  \033[1;36m5. Plot the backlog sizes from 40 to 64, given that t_min and t_max were specified and the other values would have been wrong\033[0m
+  \033[1;36m5. Plot the backlog sizes from 40 to 64, given specified limits\033[0m
      python3 probability_calculator.py 64 --plot --t_min 10 --t_max 40
 
   \033[1;36m6. For each backlog size, find the best t_min/t_max limits for it, then plot each one of them\033[0m
@@ -314,8 +363,12 @@ Notes:
             t_max=args.t_max,
         )
     elif args.sweep:
-        results = sweep_window_sizes(args.backlog_size)
+        results = sweep_window_sizes(
+            args.backlog_size, t_min=args.t_min, t_max=args.t_max
+        )
         print_results(results, title="Best Window From Sweep")
     else:
-        results = calculate_probabilities(args.backlog_size, args.t_min, args.t_max)
+        results = calculate_probabilities(
+            args.backlog_size, args.t_min, args.t_max
+        )
         print_results(results)
