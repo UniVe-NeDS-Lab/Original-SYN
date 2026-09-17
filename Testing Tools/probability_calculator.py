@@ -1,6 +1,9 @@
 import math
 import argparse
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.widgets import Slider
+import numpy as np
 
 
 def calculate_default_limits(backlog_size, act_thr, window_ratio=3/8):
@@ -179,7 +182,7 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
         if sweep:
             res = sweep_window_sizes(size, act_thr=act_thr, t_min=t_min, t_max=t_max)
         else:
-            res = calculate_probabilities(size, activation_threshold=act_thr, t_min=t_min, t_max=t_max)
+            res = calculate_probabilities(size, act_thr=act_thr, t_min=t_min, t_max=t_max)
 
         if res is None:
             continue
@@ -243,6 +246,133 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.legend(fontsize=11)
     plt.tight_layout()
+    plt.show()
+
+
+def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max=None):
+    """
+    Plots a 3D graph with 4 surfaces (TP, TN, FP, FN) across a range of backlog
+    sizes and activation thresholds.
+    """
+    start_size = 1
+    if t_max is not None and not sweep:
+        start_size = t_max
+
+    backlog_sizes = list(range(start_size, max_backlog_size + 1))
+    act_thrs = np.linspace(0.1, 0.9, 20) if act_thr is None else [act_thr]
+
+    B, A = np.meshgrid(backlog_sizes, act_thrs)
+    Z_tp = np.full_like(B, np.nan, dtype=float)
+    Z_tn = np.full_like(B, np.nan, dtype=float)
+    Z_fp = np.full_like(B, np.nan, dtype=float)
+    Z_fn = np.full_like(B, np.nan, dtype=float)
+
+    for i, a in enumerate(act_thrs):
+        for j, b in enumerate(backlog_sizes):
+            if sweep:
+                res = sweep_window_sizes(b, act_thr=a, t_min=t_min, t_max=t_max)
+            else:
+                res = calculate_probabilities(b, act_thr=a, t_min=t_min, t_max=t_max)
+
+            if res is not None:
+                Z_tp[i, j] = res["p_tp"]
+                Z_tn[i, j] = res["p_tn"]
+                Z_fp[i, j] = res["p_fp"]
+                Z_fn[i, j] = res["p_fn"]
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111, projection="3d")
+
+    ax.plot_surface(B, A, Z_tp, color="green", alpha=0.7)
+    ax.plot_surface(B, A, Z_tn, color="blue", alpha=0.7)
+    ax.plot_surface(B, A, Z_fp, color="orange", alpha=0.7)
+    ax.plot_surface(B, A, Z_fn, color="red", alpha=0.7)
+
+    legend_elements = [
+        Line2D([0], [0], color="green", lw=2, label="True Positives P(TP)"),
+        Line2D([0], [0], color="blue", lw=2, label="True Negatives P(TN)"),
+        Line2D([0], [0], color="orange", lw=2, label="False Positives P(FP)"),
+        Line2D([0], [0], color="red", lw=2, label="False Negatives P(FN)"),
+    ]
+
+    ax.set_xlabel("Backlog Size", fontsize=11)
+    ax.set_ylabel("Activation Threshold", fontsize=11)
+    ax.set_zlabel("Probability", fontsize=11)
+    ax.set_zlim(-0.05, 1.05)
+
+    title_mode = "Sweep" if sweep else "Dynamic/Fixed Limits"
+    ax.set_title(f"3D Probabilities ({title_mode})", fontsize=14)
+    ax.legend(handles=legend_elements, fontsize=10)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max=None):
+    """
+    Interactive 2D slice tool. Uses a Matplotlib slider to slice 
+    through activation thresholds and plot 2D probability curves dynamically.
+    """
+    fig, ax = plt.subplots(figsize=(10, 6))
+    plt.subplots_adjust(bottom=0.20)
+
+    start_size = t_max if (t_max is not None and not sweep) else 1
+    backlog_sizes = list(range(start_size, max_backlog_size + 1))
+    initial_thr = act_thr if act_thr is not None else 0.75
+
+    (line_tp,) = ax.plot([], [], label="True Positives P(TP)", color="green", lw=2)
+    (line_tn,) = ax.plot([], [], label="True Negatives P(TN)", color="blue", lw=2)
+    (line_fp,) = ax.plot([], [], label="False Positives P(FP)", color="orange", lw=2, ls="--")
+    (line_fn,) = ax.plot([], [], label="False Negatives P(FN)", color="red", lw=2, ls="--")
+
+    ax.set_xlim(start_size, max_backlog_size)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlabel("Backlog Size", fontsize=12)
+    ax.set_ylabel("Probability", fontsize=12)
+    ax.grid(True, linestyle="--", alpha=0.6)
+    ax.legend(loc="upper right", fontsize=11)
+
+    ax_slider = plt.axes([0.20, 0.05, 0.65, 0.03])
+    slider = Slider(
+        ax=ax_slider,
+        label="Activation Thr",
+        valmin=0.05,
+        valmax=0.95,
+        valinit=initial_thr,
+        valstep=0.01,
+    )
+
+    def update(val):
+        current_thr = slider.val
+        p_tps, p_tns, p_fps, p_fns = [], [], [], []
+
+        for size in backlog_sizes:
+            if sweep:
+                res = sweep_window_sizes(size, act_thr=current_thr, t_min=t_min, t_max=t_max)
+            else:
+                res = calculate_probabilities(size, act_thr=current_thr, t_min=t_min, t_max=t_max)
+
+            if res is None:
+                p_tps.append(np.nan)
+                p_tns.append(np.nan)
+                p_fps.append(np.nan)
+                p_fns.append(np.nan)
+            else:
+                p_tps.append(res["p_tp"])
+                p_tns.append(res["p_tn"])
+                p_fps.append(res["p_fp"])
+                p_fns.append(res["p_fn"])
+
+        line_tp.set_data(backlog_sizes, p_tps)
+        line_tn.set_data(backlog_sizes, p_tns)
+        line_fp.set_data(backlog_sizes, p_fps)
+        line_fn.set_data(backlog_sizes, p_fns)
+
+        mode_str = "Sweep" if sweep else "Dynamic Limits"
+        ax.set_title(f"2D Slice ({mode_str}) — Activation Threshold: {current_thr:.2f}", fontsize=14)
+        fig.canvas.draw_idle()
+
+    slider.on_changed(update)
+    update(initial_thr)
     plt.show()
 
 
@@ -323,25 +453,35 @@ Examples:
      python3 probability_calculator.py 64 --t_min 10 --t_max 40
      python3 probability_calculator.py 64 --t_min 10
 
-  \033[1;36m2. Calculate the probabilities with a custom activation threshold for the mitigatioj\033[0m
+  \033[1;36m3. Calculate the probabilities with a custom activation threshold for the mitigatioj\033[0m
      python3 probability_calculator.py 64 --act_thr 0.5 40
 
-  \033[1;36m3. Calculate the best possible limits (optionally fixing one) for the given backlog size\033[0m
+  \033[1;36m4. Calculate the best possible limits (optionally fixing one) for the given backlog size\033[0m
      python3 probability_calculator.py 128 --sweep
      python3 probability_calculator.py 128 --sweep --t_min 10
 
-  \033[1;36m4. Plot the backlog sizes from 1 to 32 with dynamically calculated limits based on each backlog size\033[0m
+  \033[1;36m5. Plot the backlog sizes from 1 to 32 with dynamically calculated limits based on each backlog size\033[0m
      python3 probability_calculator.py 32 --plot
 
-  \033[1;36m5. Plot the backlog sizes from 40 to 64, given specified limits\033[0m
+  \033[1;36m6. Plot the backlog sizes from 40 to 64, given specified limits\033[0m
      python3 probability_calculator.py 64 --plot --t_min 10 --t_max 40
 
-  \033[1;36m6. For each backlog size, find the best t_min/t_max limits for it, then plot each one of them\033[0m
+  \033[1;36m7. For each backlog size, find the best t_min/t_max limits for it, then plot each one of them\033[0m
      python3 probability_calculator.py 64 --plot --sweep
 
+  \033[1;36m8. Plot 3D surface graph across backlog sizes and activation thresholds\033[0m
+     python3 probability_calculator.py 32 --plot_3d
+     python3 probability_calculator.py 32 --plot_3d --sweep
+
+  \033[1;36m. Interactive 2D slice tool with a slider for activation thresholds\033[0m
+     python3 probability_calculator.py 64 --slice
+     python3 probability_calculator.py 64 --slice --sweep
+
 Notes:
-  \033[2m--plot\033[0m   Plot the results
-  \033[2m--sweep\033[0m  Search for the best t_min/t_max limits
+  \033[2m--plot\033[0m      Plot the 2D results
+  \033[2m--plot_3d\033[0m   Plot the 3D surface results
+  \033[2m--slice\033[0m     Interactive 2D slice view along activation thresholds
+  \033[2m--sweep\033[0m     Search for the best t_min/t_max limits
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -382,9 +522,37 @@ Notes:
         help="Go through all the possible backlog sizes and plot TP, TN, FP, and FN probabilities",
     )
 
+    parser.add_argument(
+        "--plot_3d",
+        action="store_true",
+        help="Plot 3D surface graph of probabilities across backlog sizes and activation thresholds",
+    )
+
+    parser.add_argument(
+        "--slice",
+        action="store_true",
+        help="Open an interactive 2D slice tool with a slider for activation thresholds",
+    )
+
     args = parser.parse_args()
 
-    if args.plot:
+    if args.plot_3d:
+        plot_probabilities_3d(
+            args.backlog_size,
+            sweep=args.sweep,
+            act_thr=args.act_thr,
+            t_min=args.t_min,
+            t_max=args.t_max,
+        )
+    elif args.slice:
+        plot_slice_2d(
+            args.backlog_size,
+            sweep=args.sweep,
+            act_thr=args.act_thr,
+            t_min=args.t_min,
+            t_max=args.t_max,
+        )
+    elif args.plot:
         plot_probabilities(
             args.backlog_size,
             sweep=args.sweep,
