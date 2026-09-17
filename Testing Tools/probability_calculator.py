@@ -3,23 +3,31 @@ import argparse
 import matplotlib.pyplot as plt
 
 
-def calculate_default_limits(backlog_size):
+def calculate_default_limits(backlog_size, act_thr, window_ratio=3/8):
     """
-    Calculate the T_min and T_max window limits based on the given backlog size
+    Calculate T_min and T_max window limits centered around the activation threshold.
     """
-    t_min = math.floor(3 / 8 * backlog_size)
-    t_max = math.floor(6 / 8 * backlog_size) + 1
+    center = act_thr * backlog_size
+    half_window = (window_ratio / 2) * backlog_size
+    
+    t_min = math.floor(center - half_window)
+    t_max = math.floor(center + half_window) + 1
     return t_min, t_max
 
 
-def calculate_probabilities(backlog_size, t_min=None, t_max=None):
+def calculate_probabilities(backlog_size, act_thr=None, t_min=None, t_max=None):
     """
     Calculate the probabilities of false positives, false negatives,
     true positives and true negatives based on the given backlog size.
     Allows specifying either or both t_min and t_max limits.
     """
+
+    if act_thr is None:
+        act_thr = 3/4
+        
     # T_min and T_max defaults if not provided
-    default_t_min, default_t_max = calculate_default_limits(backlog_size)
+    default_t_min, default_t_max = calculate_default_limits(backlog_size, act_thr)
+    
     if t_min is None:
         t_min = default_t_min
     if t_max is None:
@@ -42,7 +50,7 @@ def calculate_probabilities(backlog_size, t_min=None, t_max=None):
 
     # occurrences of false negatives
     n_fn = 0
-    start_w = math.floor(3 / 4 * backlog_size)
+    start_w = math.floor(act_thr * backlog_size)
     for w in range(start_w, t_max + 1):
         n_fn += 1 / 2 * w - t_min + 1
     n_fn = math.ceil(n_fn)
@@ -73,6 +81,7 @@ def calculate_probabilities(backlog_size, t_min=None, t_max=None):
 
     return {
         "backlog_size": backlog_size,
+        "activation_threshold": act_thr,
         "T_min": t_min,
         "T_max": t_max,
         "window_size": w_b,
@@ -88,7 +97,7 @@ def calculate_probabilities(backlog_size, t_min=None, t_max=None):
     }
 
 
-def sweep_window_sizes(backlog_size, t_min=None, t_max=None):
+def sweep_window_sizes(backlog_size, act_thr=None, t_min=None, t_max=None):
     """
     Sweep across possible T_min-T_max combinations for the window
     size (fixing t_min and/or t_max if specified) and return the values that
@@ -107,7 +116,7 @@ def sweep_window_sizes(backlog_size, t_min=None, t_max=None):
         for tx in t_max_range:
             if tx <= tm:
                 continue
-            result = calculate_probabilities(backlog_size, t_min=tm, t_max=tx)
+            result = calculate_probabilities(backlog_size, act_thr=act_thr, t_min=tm, t_max=tx)
             if result is None:
                 continue
             probabilities = [
@@ -143,7 +152,7 @@ def sweep_window_sizes(backlog_size, t_min=None, t_max=None):
     return best_result
 
 
-def plot_probabilities(max_backlog_size, sweep=False, t_min=None, t_max=None):
+def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max=None):
     """
     Works with 2 modes:
     - regular mode: calculate the probabilities with the given (or partial/default)
@@ -168,9 +177,9 @@ def plot_probabilities(max_backlog_size, sweep=False, t_min=None, t_max=None):
 
     for size in backlog_sizes:
         if sweep:
-            res = sweep_window_sizes(size, t_min=t_min, t_max=t_max)
+            res = sweep_window_sizes(size, act_thr=act_thr, t_min=t_min, t_max=t_max)
         else:
-            res = calculate_probabilities(size, t_min=t_min, t_max=t_max)
+            res = calculate_probabilities(size, activation_threshold=act_thr, t_min=t_min, t_max=t_max)
 
         if res is None:
             continue
@@ -217,13 +226,14 @@ def plot_probabilities(max_backlog_size, sweep=False, t_min=None, t_max=None):
         linestyle="--",
     )
 
+    title_act_thr = act_thr if act_thr is not None else "Default"
     if sweep:
-        plt.title(f"Probabilities vs Backlog Size (Sweep)", fontsize=14)
+        plt.title(f"Probabilities vs Backlog Size (Sweep, Threshold={title_act_thr})", fontsize=14)
     else:
         title_t_min = t_min if t_min is not None else "Dynamic"
         title_t_max = t_max if t_max is not None else "Dynamic"
         plt.title(
-            f"Probabilities vs Backlog Size (T_min={title_t_min}, T_max={title_t_max})",
+            f"Probabilities vs Backlog Size (T_min={title_t_min}, T_max={title_t_max}, Threshold={title_act_thr})",
             fontsize=14,
         )
 
@@ -243,6 +253,8 @@ def print_results(results, title="Calculation Results"):
 
     print(f"--- {title} ---")
     print(f"Backlog Size: {results['backlog_size']}")
+    if "activation_threshold" in results:
+        print(f"Activation Threshold: {results['activation_threshold']}")
     print(f"T_min: {results['T_min']}")
     print(f"T_max: {results['T_max']}")
     print(f"Window Size: {results['window_size']}")
@@ -264,7 +276,7 @@ def print_results(results, title="Calculation Results"):
 
     print("-" * 25)
     total = results["total_sample_space"]
-    print("                 ALIVE                                  OFFLINE")
+    print("                    CLASSIFIED AS ALIVE                    CLASSIFIED AS OFFLINE")
     print(
         f"Target ALIVE    TP: {results['n_tp']} / {total} "
         f"({results['p_tp']:.6f} = {results['p_tp'] * 100:.2f}%)    "
@@ -292,6 +304,13 @@ def print_results(results, title="Calculation Results"):
 
 
 if __name__ == "__main__":
+    # results = calculate_probabilities(
+    #     64, 1/4, # 0, 0
+    # )
+    # print_results(results)
+
+    # exit()
+
     parser = argparse.ArgumentParser(
         description="Calculate probabilities based on backlog size",
         epilog="""
@@ -303,6 +322,9 @@ Examples:
   \033[1;36m2. Calculate the probabilities with one or more specified t_min/t_max limits\033[0m
      python3 probability_calculator.py 64 --t_min 10 --t_max 40
      python3 probability_calculator.py 64 --t_min 10
+
+  \033[1;36m2. Calculate the probabilities with a custom activation threshold for the mitigatioj\033[0m
+     python3 probability_calculator.py 64 --act_thr 0.5 40
 
   \033[1;36m3. Calculate the best possible limits (optionally fixing one) for the given backlog size\033[0m
      python3 probability_calculator.py 128 --sweep
@@ -342,6 +364,13 @@ Notes:
     )
 
     parser.add_argument(
+        "--act_thr",
+        type=float,
+        required=False,
+        help="activation threshold of the mitigation. Defaults to 0.75 (or 3/4)",
+    )
+
+    parser.add_argument(
         "--sweep",
         action="store_true",
         help="try all possible window sizes and find the probabilities closest to 0.5",
@@ -359,16 +388,17 @@ Notes:
         plot_probabilities(
             args.backlog_size,
             sweep=args.sweep,
+            act_thr=args.act_thr,
             t_min=args.t_min,
             t_max=args.t_max,
         )
     elif args.sweep:
         results = sweep_window_sizes(
-            args.backlog_size, t_min=args.t_min, t_max=args.t_max
+            args.backlog_size, act_thr=args.act_thr, t_min=args.t_min, t_max=args.t_max
         )
         print_results(results, title="Best Window From Sweep")
     else:
         results = calculate_probabilities(
-            args.backlog_size, args.t_min, args.t_max
+            args.backlog_size, args.act_thr, args.t_min, args.t_max
         )
         print_results(results)
