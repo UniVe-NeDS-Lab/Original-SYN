@@ -155,6 +155,47 @@ def sweep_window_sizes(backlog_size, act_thr=None, t_min=None, t_max=None):
     return best_result
 
 
+def add_hover_annotation(fig, ax, lines, get_res_fn):
+    """Helper function to add hover annotations displaying parameters for plotted lines."""
+    annot = ax.annotate(
+        "",
+        xy=(0, 0),
+        xytext=(15, 15),
+        textcoords="offset points",
+        bbox=dict(boxstyle="round", fc="white", ec="gray", alpha=0.9),
+        arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0"),
+    )
+    annot.set_visible(False)
+
+    def hover(event):
+        if event.inaxes == ax:
+            for line in lines:
+                cont, ind = line.contains(event)
+                if cont:
+                    idx = ind["ind"][0]
+                    res = get_res_fn(idx)
+                    if res:
+                        x = line.get_xdata()[idx]
+                        y = line.get_ydata()[idx]
+                        annot.xy = (x, y)
+                        text = (
+                            f"{line.get_label()}\n"
+                            f"Backlog Size: {res['backlog_size']}\n"
+                            f"Prob: {y:.4f}\n"
+                            f"T_min: {res['T_min']}, T_max: {res['T_max']}\n"
+                            f"Act Thr: {res['activation_threshold']}"
+                        )
+                        annot.set_text(text)
+                        annot.set_visible(True)
+                        fig.canvas.draw_idle()
+                        return
+        if annot.get_visible():
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+
+    fig.canvas.mpl_connect("motion_notify_event", hover)
+
+
 def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max=None):
     """
     Works with 2 modes:
@@ -177,6 +218,7 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
     valid_sizes = []
     p_tps, p_tns, p_fps, p_fns = [], [], [], []
+    results_list = []
 
     for size in backlog_sizes:
         if sweep:
@@ -188,6 +230,7 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
             continue
 
         valid_sizes.append(size)
+        results_list.append(res)
         p_tps.append(res["p_tp"])
         p_tns.append(res["p_tn"])
         p_fps.append(res["p_fp"])
@@ -198,21 +241,21 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
         return
 
     plt.figure(figsize=(10, 6))
-    plt.plot(
+    (line_tp,) = plt.plot(
         valid_sizes,
         p_tps,
         label="True Positives P(TP)",
         color="green",
         linewidth=2,
     )
-    plt.plot(
+    (line_tn,) = plt.plot(
         valid_sizes,
         p_tns,
         label="True Negatives P(TN)",
         color="blue",
         linewidth=2,
     )
-    plt.plot(
+    (line_fp,) = plt.plot(
         valid_sizes,
         p_fps,
         label="False Positives P(FP)",
@@ -220,7 +263,7 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
         linewidth=2,
         linestyle="--",
     )
-    plt.plot(
+    (line_fn,) = plt.plot(
         valid_sizes,
         p_fns,
         label="False Negatives P(FN)",
@@ -228,6 +271,8 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
         linewidth=2,
         linestyle="--",
     )
+
+    add_hover_annotation(plt.gcf(), plt.gca(), [line_tp, line_tn, line_fp, line_fn], lambda i: results_list[i])
 
     title_act_thr = act_thr if act_thr is not None else "Default"
     if sweep:
@@ -324,6 +369,8 @@ def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max
     (line_fp,) = ax.plot([], [], label="False Positives P(FP)", color="orange", lw=2, ls="--")
     (line_fn,) = ax.plot([], [], label="False Negatives P(FN)", color="red", lw=2, ls="--")
 
+    current_results = []
+
     ax.set_xlim(start_size, max_backlog_size)
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlabel("Backlog Size", fontsize=12)
@@ -342,8 +389,10 @@ def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max
     )
 
     def update(val):
+        nonlocal current_results
         current_thr = slider.val
         p_tps, p_tns, p_fps, p_fns = [], [], [], []
+        current_results = []
 
         for size in backlog_sizes:
             if sweep:
@@ -356,11 +405,13 @@ def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max
                 p_tns.append(np.nan)
                 p_fps.append(np.nan)
                 p_fns.append(np.nan)
+                current_results.append(None)
             else:
                 p_tps.append(res["p_tp"])
                 p_tns.append(res["p_tn"])
                 p_fps.append(res["p_fp"])
                 p_fns.append(res["p_fn"])
+                current_results.append(res)
 
         line_tp.set_data(backlog_sizes, p_tps)
         line_tn.set_data(backlog_sizes, p_tns)
@@ -368,8 +419,10 @@ def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max
         line_fn.set_data(backlog_sizes, p_fns)
 
         mode_str = "Sweep" if sweep else "Dynamic Limits"
-        ax.set_title(f"2D Slice ({mode_str}) — Activation Threshold: {current_thr:.2f}", fontsize=14)
+        ax.set_title(f"2D Slice ({mode_str}) - Activation Threshold: {current_thr:.2f}", fontsize=14)
         fig.canvas.draw_idle()
+
+    add_hover_annotation(fig, ax, [line_tp, line_tn, line_fp, line_fn], lambda i: current_results[i] if i < len(current_results) else None)
 
     slider.on_changed(update)
     update(initial_thr)
