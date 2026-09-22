@@ -6,13 +6,13 @@ from matplotlib.widgets import Slider, CheckButtons
 import numpy as np
 
 
-def calculate_default_limits(backlog_size, window_center, window_ratio=3/8):
+def calculate_default_limits(backlog_size, window_center, window_ratio=3 / 8):
     """
     Calculate T_min and T_max window limits centered around the window center threshold
     """
     center = window_center * backlog_size
     half_window = (window_ratio / 2) * backlog_size
-    
+
     t_min = math.floor(center - half_window)
     t_max = math.floor(center + half_window) + 1
 
@@ -21,7 +21,7 @@ def calculate_default_limits(backlog_size, window_center, window_ratio=3/8):
         t_min = 0
 
     if t_max > backlog_size:
-        t_min -= (t_max - backlog_size)
+        t_min -= t_max - backlog_size
         t_max = backlog_size
 
     t_min = max(0, t_min)
@@ -30,7 +30,9 @@ def calculate_default_limits(backlog_size, window_center, window_ratio=3/8):
     return t_min, t_max
 
 
-def calculate_probabilities(backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None):
+def calculate_probabilities(
+    backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None
+):
     """
     Calculate the probabilities of false positives, false negatives,
     true positives and true negatives based on the given backlog size.
@@ -39,8 +41,8 @@ def calculate_probabilities(backlog_size, act_thr=None, window_center=None, t_mi
     """
 
     if act_thr is None:
-        act_thr = 18/32
-        
+        act_thr = 18 / 32
+
     if window_center is None:
         window_center = act_thr
 
@@ -49,7 +51,7 @@ def calculate_probabilities(backlog_size, act_thr=None, window_center=None, t_mi
 
     # T_min and T_max defaults if not provided
     default_t_min, default_t_max = calculate_default_limits(backlog_size, window_center)
-    
+
     if t_min is None:
         t_min = default_t_min
     if t_max is None:
@@ -92,8 +94,7 @@ def calculate_probabilities(backlog_size, act_thr=None, window_center=None, t_mi
         or n_tp > total_sample_space
         or n_tn > total_sample_space
     ):
-        raise Exception(
-f"""Invalid values were calculated:
+        raise Exception(f"""Invalid values were calculated:
 n_fp: {n_fp} (should be >= 0)
 n_fn: {n_fn} (should be >= 0)
 n_tp: {n_tp} (should be >= 0)
@@ -103,7 +104,6 @@ n_fn: {n_fn} (should be <= {total_sample_space})
 n_tp: {n_tp} (should be <= {total_sample_space})
 n_tn: {n_tn} (should be <= {total_sample_space})
 """)
-
 
     # probabilities
     p_fp = n_fp / total_sample_space
@@ -130,9 +130,11 @@ n_tn: {n_tn} (should be <= {total_sample_space})
     }
 
 
-def sweep_window_sizes(backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None):
+def sweep_window_sizes(
+    backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None
+):
     """
-    Sweep across possible T_min-T_max combinations for the window
+    Sweep across possible T_min-T_max size combinations for the window
     size (fixing t_min and/or t_max if specified) and return the values that
     make the 4 probabilities as close to 0.5 as possible
     """
@@ -143,14 +145,16 @@ def sweep_window_sizes(backlog_size, act_thr=None, window_center=None, t_min=Non
 
     # for all possible combinations
     for tm in t_min_range:
-        t_max_range = (
-            [t_max] if t_max is not None else range(tm + 1, backlog_size + 1)
-        )
+        t_max_range = [t_max] if t_max is not None else range(tm + 1, backlog_size + 1)
         for tx in t_max_range:
             if tx <= tm:
                 continue
             result = calculate_probabilities(
-                backlog_size, act_thr=act_thr, window_center=window_center, t_min=tm, t_max=tx
+                backlog_size,
+                act_thr=act_thr,
+                window_center=window_center,
+                t_min=tm,
+                t_max=tx,
             )
             if result is None:
                 continue
@@ -229,7 +233,14 @@ def add_hover_annotation(fig, ax, lines, get_res_fn):
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
+def plot_probabilities(
+    max_backlog_size,
+    sweep=False,
+    act_thr=None,
+    window_center=None,
+    t_min=None,
+    t_max=None,
+):
     """
     Works with 2 modes:
     - regular mode: calculate the probabilities with the given (or partial/default)
@@ -237,7 +248,7 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, window_cente
                     limits will be calculated on the fly with the
                     usual proportions
     - sweep mode: sweeps through the backlog sizes from 1 to max_backlog_size,
-                  calculating the best score for each (respecting fixed limits if given) 
+                  calculating the best score for each (respecting fixed limits if given)
                   and plotting the result
     """
     start_size = 1
@@ -256,11 +267,19 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, window_cente
     for size in backlog_sizes:
         if sweep:
             res = sweep_window_sizes(
-                size, act_thr=act_thr, window_center=window_center, t_min=t_min, t_max=t_max
+                size,
+                act_thr=act_thr,
+                window_center=window_center,
+                t_min=t_min,
+                t_max=t_max,
             )
         else:
             res = calculate_probabilities(
-                size, act_thr=act_thr, window_center=window_center, t_min=t_min, t_max=t_max
+                size,
+                act_thr=act_thr,
+                window_center=window_center,
+                t_min=t_min,
+                t_max=t_max,
             )
 
         if res is None:
@@ -309,11 +328,19 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, window_cente
         linestyle="--",
     )
 
-    add_hover_annotation(plt.gcf(), plt.gca(), [line_tp, line_tn, line_fp, line_fn], lambda i: results_list[i])
+    add_hover_annotation(
+        plt.gcf(),
+        plt.gca(),
+        [line_tp, line_tn, line_fp, line_fn],
+        lambda i: results_list[i],
+    )
 
     title_act_thr = act_thr if act_thr is not None else "Default"
     if sweep:
-        plt.title(f"Probabilities vs Backlog Size (Sweep, Threshold={title_act_thr})", fontsize=14)
+        plt.title(
+            f"Probabilities vs Backlog Size (Sweep, Threshold={title_act_thr})",
+            fontsize=14,
+        )
     else:
         title_t_min = t_min if t_min is not None else "Dynamic"
         title_t_max = t_max if t_max is not None else "Dynamic"
@@ -331,7 +358,14 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, window_cente
     plt.show()
 
 
-def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
+def plot_probabilities_3d(
+    max_backlog_size,
+    sweep=False,
+    act_thr=None,
+    window_center=None,
+    t_min=None,
+    t_max=None,
+):
     """
     Plots a 3D graph with 4 surfaces (TP, TN, FP, FN) across a range of backlog
     sizes and activation thresholds.
@@ -393,9 +427,16 @@ def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, window_ce
     plt.show()
 
 
-def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
+def plot_sliders(
+    max_backlog_size,
+    sweep=False,
+    act_thr=None,
+    window_center=None,
+    t_min=None,
+    t_max=None,
+):
     """
-    Uses Matplotlib sliders to "slice" through activation thresholds and window centers 
+    Uses Matplotlib sliders to "slice" through activation thresholds and window centers
     of the plot in order to plot the 2D probability curves dynamically
     """
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -403,16 +444,20 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
 
     start_size = 1
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
-    initial_thr = act_thr if act_thr is not None else 18/32
+    initial_thr = act_thr if act_thr is not None else 18 / 32
     initial_center = window_center if window_center is not None else initial_thr
     initial_t_min = t_min if t_min is not None else 0
     initial_t_max = t_max if t_max is not None else max_backlog_size
-    initial_use_t = (t_min is not None or t_max is not None)
+    initial_use_t = t_min is not None or t_max is not None
 
     (line_tp,) = ax.plot([], [], label="True Positives P(TP)", color="green", lw=2)
     (line_tn,) = ax.plot([], [], label="True Negatives P(TN)", color="blue", lw=2)
-    (line_fp,) = ax.plot([], [], label="False Positives P(FP)", color="orange", lw=2, ls="--")
-    (line_fn,) = ax.plot([], [], label="False Negatives P(FN)", color="red", lw=2, ls="--")
+    (line_fp,) = ax.plot(
+        [], [], label="False Positives P(FP)", color="orange", lw=2, ls="--"
+    )
+    (line_fn,) = ax.plot(
+        [], [], label="False Negatives P(FN)", color="red", lw=2, ls="--"
+    )
 
     current_results = []
 
@@ -506,9 +551,7 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
 
         for size in backlog_sizes:
             if is_sweep:
-                res = sweep_window_sizes(
-                    size, act_thr=curr_thr
-                )
+                res = sweep_window_sizes(size, act_thr=curr_thr)
             elif is_spec_t:
                 if size < curr_t_max:
                     res = None
@@ -546,10 +589,17 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
         else:
             mode_str = "Dynamic Limits"
 
-        ax.set_title(f"2D Slice ({mode_str}) - Activation Threshold: {curr_thr:.2f}", fontsize=14)
+        ax.set_title(
+            f"2D Slice ({mode_str}) - Activation Threshold: {curr_thr:.2f}", fontsize=14
+        )
         fig.canvas.draw_idle()
 
-    add_hover_annotation(fig, ax, [line_tp, line_tn, line_fp, line_fn], lambda i: current_results[i] if i < len(current_results) else None)
+    add_hover_annotation(
+        fig,
+        ax,
+        [line_tp, line_tn, line_fp, line_fn],
+        lambda i: current_results[i] if i < len(current_results) else None,
+    )
 
     slider_thr.on_changed(update)
     slider_center.on_changed(update)
@@ -592,7 +642,9 @@ def print_results(results, title="Calculation Results"):
 
     print("-" * 25)
     total = results["total_sample_space"]
-    print("                    CLASSIFIED AS ALIVE                    CLASSIFIED AS OFFLINE")
+    print(
+        "                    CLASSIFIED AS ALIVE                    CLASSIFIED AS OFFLINE"
+    )
     print(
         f"Target ALIVE    TP: {results['n_tp']} / {total} "
         f"({results['p_tp']:.6f} = {results['p_tp'] * 100:.2f}%)    "
@@ -618,7 +670,6 @@ def print_results(results, title="Calculation Results"):
     print("--------------------------")
 
 
-
 if __name__ == "__main__":
     # results = calculate_probabilities(
     #         30, 3/4
@@ -635,10 +686,10 @@ if __name__ == "__main__":
         epilog="""
 Examples:
 
-  \033[1;36m1. Calculate the probabilities and t_min/t_max limits automatically\033[0m
+  \033[1;36m1. Calculate the probabilities and t_min/t_max backlog size limits automatically\033[0m
      python3 probability_calculator.py 32
 
-  \033[1;36m2. Calculate the probabilities with one or more specified t_min/t_max limits\033[0m
+  \033[1;36m2. Calculate the probabilities with one or more specified t_min/t_max backlog size limits\033[0m
      python3 probability_calculator.py 64 --t_min 10 --t_max 40
      python3 probability_calculator.py 64 --t_min 10
 
@@ -653,10 +704,10 @@ Examples:
   \033[1;36m5. Plot the backlog sizes from 1 to 32 with dynamically calculated limits based on each backlog size\033[0m
      python3 probability_calculator.py 32 --plot
 
-  \033[1;36m6. Plot the backlog sizes from 40 to 64, given specified limits\033[0m
+  \033[1;36m6. Plot the backlog sizes from 40 to 64, given specified backlog size limits\033[0m
      python3 probability_calculator.py 64 --plot --t_min 10 --t_max 40
 
-  \033[1;36m7. For each backlog size, find the best t_min/t_max limits for it, then plot each one of them\033[0m
+  \033[1;36m7. For each backlog size, find the best t_min/t_max backlog size limits for it, then plot each one of them\033[0m
      python3 probability_calculator.py 64 --plot --sweep
 
   \033[1;36m8. Plot 3D surface graph across backlog sizes and activation thresholds\033[0m
@@ -671,7 +722,7 @@ Notes:
   \033[2m--plot\033[0m        Plot the 2D results
   \033[2m--plot_3d\033[0m     Plot the 3D surface results
   \033[2m--sliders\033[0m     Interactive 2D view along sliders to change the values
-  \033[2m--sweep\033[0m       Search for the best t_min/t_max limits
+  \033[2m--sweep\033[0m       Search for the best t_min/t_max backlog size limits
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -682,28 +733,28 @@ Notes:
         "--t_min",
         type=int,
         required=False,
-        help="lower limit for the window size",
+        help="lower limit for the backlog window size",
     )
 
     parser.add_argument(
         "--t_max",
         type=int,
         required=False,
-        help="upper limit for the window size",
+        help="upper limit for the backlog window size",
     )
 
     parser.add_argument(
         "--act_thr",
         type=float,
         required=False,
-        help="activation threshold of the mitigation. Defaults to 0.75 (or 3/4)",
+        help="activation threshold of the mitigation. Defaults to 0.5625 (or 18/32)",
     )
 
     parser.add_argument(
         "--window_center",
         type=float,
         required=False,
-        help="threshold ratio used to center t_min/t_max limits automatically when they are not specified directly by the user. Defaults to act_thr if not given",
+        help="threshold ratio used to center t_min/t_max backlog size limits automatically when they are not specified directly by the user. Defaults to act_thr if not given",
     )
 
     parser.add_argument(
