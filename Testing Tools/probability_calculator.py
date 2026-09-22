@@ -37,6 +37,9 @@ def calculate_probabilities(backlog_size, act_thr=None, window_center=None, t_mi
     if window_center is None:
         window_center = act_thr
 
+    # flag set when the automatic t_min/t_max centering was used
+    center_inop = t_min is not None and t_max is not None
+
     # T_min and T_max defaults if not provided
     default_t_min, default_t_max = calculate_default_limits(backlog_size, window_center)
     
@@ -104,7 +107,7 @@ n_tn: {n_tn} (should be <= {total_sample_space})
     return {
         "backlog_size": backlog_size,
         "activation_threshold": act_thr,
-        "window_center": window_center,
+        "window_center": "INOP" if center_inop else window_center,
         "T_min": t_min,
         "T_max": t_max,
         "window_size": w_b,
