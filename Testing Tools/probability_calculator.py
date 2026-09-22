@@ -2,7 +2,7 @@ import math
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.widgets import Slider
+from matplotlib.widgets import Slider, CheckButtons
 import numpy as np
 
 
@@ -389,12 +389,15 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
     of the plot in order to plot the 2D probability curves dynamically
     """
     fig, ax = plt.subplots(figsize=(10, 6))
-    plt.subplots_adjust(bottom=0.25)
+    plt.subplots_adjust(bottom=0.35)
 
-    start_size = t_max if (t_max is not None and not sweep) else 1
+    start_size = 1
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
     initial_thr = act_thr if act_thr is not None else 0.75
     initial_center = window_center if window_center is not None else initial_thr
+    initial_t_min = t_min if t_min is not None else 0
+    initial_t_max = t_max if t_max is not None else max_backlog_size
+    initial_use_t = (t_min is not None or t_max is not None)
 
     (line_tp,) = ax.plot([], [], label="True Positives P(TP)", color="green", lw=2)
     (line_tn,) = ax.plot([], [], label="True Negatives P(TN)", color="blue", lw=2)
@@ -410,7 +413,7 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
     ax.grid(True, linestyle="--", alpha=0.6)
     ax.legend(loc="upper right", fontsize=11)
 
-    ax_slider_thr = plt.axes([0.20, 0.08, 0.65, 0.03])
+    ax_slider_thr = plt.axes([0.25, 0.25, 0.48, 0.03])
     slider_thr = Slider(
         ax=ax_slider_thr,
         label="Activation Thr",
@@ -418,9 +421,10 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
         valmax=0.99,
         valinit=initial_thr,
         valstep=0.01,
+        valfmt="%0.2f",
     )
 
-    ax_slider_center = plt.axes([0.20, 0.03, 0.65, 0.03])
+    ax_slider_center = plt.axes([0.25, 0.20, 0.48, 0.03])
     slider_center = Slider(
         ax=ax_slider_center,
         label="Window Center",
@@ -428,31 +432,80 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
         valmax=0.99,
         valinit=initial_center,
         valstep=0.01,
+        valfmt="%0.2f",
     )
 
-    if sweep:
-        slider_center.set_active(False)
-        slider_center.track.set_facecolor("0.85")
-        slider_center.poly.set_facecolor("0.7")
-        slider_center.poly.set_edgecolor("0.7")
-        slider_center.valtext.set_color("0.6")
-        slider_center.label.set_color("0.6")
+    ax_slider_t_min = plt.axes([0.25, 0.15, 0.48, 0.03])
+    slider_t_min = Slider(
+        ax=ax_slider_t_min,
+        label="T_min",
+        valmin=0,
+        valmax=max_backlog_size,
+        valinit=initial_t_min,
+        valstep=1,
+        valfmt="%d",
+    )
+
+    ax_slider_t_max = plt.axes([0.25, 0.10, 0.48, 0.03])
+    slider_t_max = Slider(
+        ax=ax_slider_t_max,
+        label="T_max",
+        valmin=0,
+        valmax=max_backlog_size,
+        valinit=initial_t_max,
+        valstep=1,
+        valfmt="%d",
+    )
+
+    ax_check = plt.axes([0.78, 0.10, 0.18, 0.18])
+    check = CheckButtons(
+        ax=ax_check,
+        labels=["Sweep", "Specify T_min/T_max"],
+        actives=[sweep, initial_use_t],
+    )
+
+    def set_slider_state(slider, active):
+        slider.set_active(active)
+        color = "black" if active else "0.6"
+        slider.label.set_color(color)
+        slider.valtext.set_color(color)
+        if hasattr(slider, "track"):
+            slider.track.set_facecolor("0.9" if active else "0.85")
+        if hasattr(slider, "poly"):
+            slider.poly.set_facecolor("0.25" if active else "0.7")
+        if not active:
+            slider.valtext.set_text("INOP")
+        else:
+            slider.valtext.set_text(slider.valfmt % slider.val)
 
     def update(val):
         nonlocal current_results
-        current_thr = slider_thr.val
-        current_center = slider_center.val
+        is_sweep, is_spec_t = check.get_status()
+        curr_thr = slider_thr.val
+        curr_center = slider_center.val
+        curr_t_min = int(slider_t_min.val)
+        curr_t_max = int(slider_t_max.val)
+
+        set_slider_state(slider_thr, True)
+        set_slider_state(slider_center, not is_sweep and not is_spec_t)
+        set_slider_state(slider_t_min, not is_sweep and is_spec_t)
+        set_slider_state(slider_t_max, not is_sweep and is_spec_t)
+
         p_tps, p_tns, p_fps, p_fns = [], [], [], []
         current_results = []
 
         for size in backlog_sizes:
-            if sweep:
+            if is_sweep:
                 res = sweep_window_sizes(
-                    size, act_thr=current_thr, window_center=current_center, t_min=t_min, t_max=t_max
+                    size, act_thr=curr_thr
+                )
+            elif is_spec_t:
+                res = calculate_probabilities(
+                    size, act_thr=curr_thr, t_min=curr_t_min, t_max=curr_t_max
                 )
             else:
                 res = calculate_probabilities(
-                    size, act_thr=current_thr, window_center=current_center, t_min=t_min, t_max=t_max
+                    size, act_thr=curr_thr, window_center=curr_center
                 )
 
             if res is None:
@@ -473,15 +526,23 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
         line_fp.set_data(backlog_sizes, p_fps)
         line_fn.set_data(backlog_sizes, p_fns)
 
-        mode_str = "Sweep" if sweep else "Dynamic Limits"
-        thr_str = "INOP" if sweep else f"{current_thr:.2f}"
-        ax.set_title(f"2D Slice ({mode_str}) - Activation Threshold: {thr_str}", fontsize=14)
+        if is_sweep:
+            mode_str = "Sweep"
+        elif is_spec_t:
+            mode_str = f"Fixed Limits (T_min={curr_t_min}, T_max={curr_t_max})"
+        else:
+            mode_str = "Dynamic Limits"
+
+        ax.set_title(f"2D Slice ({mode_str}) - Activation Threshold: {curr_thr:.2f}", fontsize=14)
         fig.canvas.draw_idle()
 
     add_hover_annotation(fig, ax, [line_tp, line_tn, line_fp, line_fn], lambda i: current_results[i] if i < len(current_results) else None)
 
     slider_thr.on_changed(update)
     slider_center.on_changed(update)
+    slider_t_min.on_changed(update)
+    slider_t_max.on_changed(update)
+    check.on_clicked(update)
     update(None)
     plt.show()
 
