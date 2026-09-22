@@ -122,3 +122,6 @@ Al fine di fare la scelta che più permette a tutte le probabilità di avvicinar
 
 Otteniamo quindi il seguente grafico, il quale illustra come aumentare la backlog size vada a far avvicinare al $50\%$ le probabilità per un client effettivamente not-alive, mentre un client alive diventa mano a mano sempre più evidente all'attaccante del fatto che sia attivo. Questo è riflesso anche dai calcoli analitici e sperimentali effettuati dalla tesi.
 ![[PlotProbVsBacklog.png]]
+
+Esaminando manualmente con ulteriore libertà nella scelta dei parametri, possiamo notare che impostare un'activation threshold praticamente pari a $0$ (mitigazione sempre attiva), possiamo notare come i valori che rendono le probabilità più vicine al $50\%$ siano di $T_{min}=0$ e $T_{max}\approx 4$.
+![[ProbabilitiesTo50.mp4]]
