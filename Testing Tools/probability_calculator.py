@@ -6,11 +6,11 @@ from matplotlib.widgets import Slider
 import numpy as np
 
 
-def calculate_default_limits(backlog_size, act_thr, window_ratio=3/8):
+def calculate_default_limits(backlog_size, window_center, window_ratio=3/8):
     """
-    Calculate T_min and T_max window limits centered around the activation threshold.
+    Calculate T_min and T_max window limits centered around the window center threshold
     """
-    center = act_thr * backlog_size
+    center = window_center * backlog_size
     half_window = (window_ratio / 2) * backlog_size
     
     t_min = math.floor(center - half_window)
@@ -23,18 +23,22 @@ def calculate_default_limits(backlog_size, act_thr, window_ratio=3/8):
     return t_min, t_max
 
 
-def calculate_probabilities(backlog_size, act_thr=None, t_min=None, t_max=None):
+def calculate_probabilities(backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None):
     """
     Calculate the probabilities of false positives, false negatives,
     true positives and true negatives based on the given backlog size.
-    Allows specifying either or both t_min and t_max limits.
+    Allows specifying either or both t_min and t_max limits as well as a separate
+    window_center for dynamic limit calculations.
     """
 
     if act_thr is None:
         act_thr = 3/4
         
+    if window_center is None:
+        window_center = act_thr
+
     # T_min and T_max defaults if not provided
-    default_t_min, default_t_max = calculate_default_limits(backlog_size, act_thr)
+    default_t_min, default_t_max = calculate_default_limits(backlog_size, window_center)
     
     if t_min is None:
         t_min = default_t_min
@@ -100,6 +104,7 @@ n_tn: {n_tn} (should be <= {total_sample_space})
     return {
         "backlog_size": backlog_size,
         "activation_threshold": act_thr,
+        "window_center": window_center,
         "T_min": t_min,
         "T_max": t_max,
         "window_size": w_b,
@@ -115,7 +120,7 @@ n_tn: {n_tn} (should be <= {total_sample_space})
     }
 
 
-def sweep_window_sizes(backlog_size, act_thr=None, t_min=None, t_max=None):
+def sweep_window_sizes(backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None):
     """
     Sweep across possible T_min-T_max combinations for the window
     size (fixing t_min and/or t_max if specified) and return the values that
@@ -134,7 +139,9 @@ def sweep_window_sizes(backlog_size, act_thr=None, t_min=None, t_max=None):
         for tx in t_max_range:
             if tx <= tm:
                 continue
-            result = calculate_probabilities(backlog_size, act_thr=act_thr, t_min=tm, t_max=tx)
+            result = calculate_probabilities(
+                backlog_size, act_thr=act_thr, window_center=window_center, t_min=tm, t_max=tx
+            )
             if result is None:
                 continue
             probabilities = [
@@ -198,7 +205,8 @@ def add_hover_annotation(fig, ax, lines, get_res_fn):
                             f"Backlog Size: {res['backlog_size']}\n"
                             f"Prob: {y:.4f}\n"
                             f"T_min: {res['T_min']}, T_max: {res['T_max']}\n"
-                            f"Act Thr: {res['activation_threshold']}"
+                            f"Act Thr: {res['activation_threshold']}\n"
+                            f"Window Center: {res.get('window_center', res['activation_threshold'])}"
                         )
                         annot.set_text(text)
                         annot.set_visible(True)
@@ -211,7 +219,7 @@ def add_hover_annotation(fig, ax, lines, get_res_fn):
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max=None):
+def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
     """
     Works with 2 modes:
     - regular mode: calculate the probabilities with the given (or partial/default)
@@ -237,9 +245,13 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
 
     for size in backlog_sizes:
         if sweep:
-            res = sweep_window_sizes(size, act_thr=act_thr, t_min=t_min, t_max=t_max)
+            res = sweep_window_sizes(
+                size, act_thr=act_thr, window_center=window_center, t_min=t_min, t_max=t_max
+            )
         else:
-            res = calculate_probabilities(size, act_thr=act_thr, t_min=t_min, t_max=t_max)
+            res = calculate_probabilities(
+                size, act_thr=act_thr, window_center=window_center, t_min=t_min, t_max=t_max
+            )
 
         if res is None:
             continue
@@ -309,7 +321,7 @@ def plot_probabilities(max_backlog_size, sweep=False, act_thr=None, t_min=None, 
     plt.show()
 
 
-def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max=None):
+def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
     """
     Plots a 3D graph with 4 surfaces (TP, TN, FP, FN) across a range of backlog
     sizes and activation thresholds.
@@ -330,9 +342,13 @@ def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, t_min=Non
     for i, a in enumerate(act_thrs):
         for j, b in enumerate(backlog_sizes):
             if sweep:
-                res = sweep_window_sizes(b, act_thr=a, t_min=t_min, t_max=t_max)
+                res = sweep_window_sizes(
+                    b, act_thr=a, window_center=window_center, t_min=t_min, t_max=t_max
+                )
             else:
-                res = calculate_probabilities(b, act_thr=a, t_min=t_min, t_max=t_max)
+                res = calculate_probabilities(
+                    b, act_thr=a, window_center=window_center, t_min=t_min, t_max=t_max
+                )
 
             if res is not None:
                 Z_tp[i, j] = res["p_tp"]
@@ -367,7 +383,7 @@ def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, t_min=Non
     plt.show()
 
 
-def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max=None):
+def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
     """
     Interactive 2D slice tool. Uses a Matplotlib slider to slice 
     through activation thresholds and plot 2D probability curves dynamically.
@@ -411,9 +427,13 @@ def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max
 
         for size in backlog_sizes:
             if sweep:
-                res = sweep_window_sizes(size, act_thr=current_thr, t_min=t_min, t_max=t_max)
+                res = sweep_window_sizes(
+                    size, act_thr=current_thr, window_center=window_center, t_min=t_min, t_max=t_max
+                )
             else:
-                res = calculate_probabilities(size, act_thr=current_thr, t_min=t_min, t_max=t_max)
+                res = calculate_probabilities(
+                    size, act_thr=current_thr, window_center=window_center, t_min=t_min, t_max=t_max
+                )
 
             if res is None:
                 p_tps.append(np.nan)
@@ -453,6 +473,8 @@ def print_results(results, title="Calculation Results"):
     print(f"Backlog Size: {results['backlog_size']}")
     if "activation_threshold" in results:
         print(f"Activation Threshold: {results['activation_threshold']}")
+    if "window_center" in results:
+        print(f"Window Center: {results['window_center']}")
     print(f"T_min: {results['T_min']}")
     print(f"T_max: {results['T_max']}")
     print(f"Window Size: {results['window_size']}")
@@ -524,8 +546,9 @@ Examples:
      python3 probability_calculator.py 64 --t_min 10 --t_max 40
      python3 probability_calculator.py 64 --t_min 10
 
-  \033[1;36m3. Calculate the probabilities with a custom activation threshold for the mitigatioj\033[0m
-     python3 probability_calculator.py 64 --act_thr 0.5 40
+  \033[1;36m3. Calculate the probabilities with a custom activation threshold and/or window center\033[0m
+     python3 probability_calculator.py 64 --act_thr 0.5
+     python3 probability_calculator.py 64 --act_thr 0.75 --window_center 0.5
 
   \033[1;36m4. Calculate the best possible limits (optionally fixing one) for the given backlog size\033[0m
      python3 probability_calculator.py 128 --sweep
@@ -544,19 +567,18 @@ Examples:
      python3 probability_calculator.py 32 --plot_3d
      python3 probability_calculator.py 32 --plot_3d --sweep
 
-  \033[1;36m. Interactive 2D slice tool with a slider for activation thresholds\033[0m
+  \033[1;36m9. Interactive 2D slice tool with a slider for activation thresholds\033[0m
      python3 probability_calculator.py 64 --slice
      python3 probability_calculator.py 64 --slice --sweep
 
 Notes:
-  \033[2m--plot\033[0m      Plot the 2D results
-  \033[2m--plot_3d\033[0m   Plot the 3D surface results
-  \033[2m--slice\033[0m     Interactive 2D slice view along activation thresholds
-  \033[2m--sweep\033[0m     Search for the best t_min/t_max limits
+  \033[2m--plot\033[0m        Plot the 2D results
+  \033[2m--plot_3d\033[0m     Plot the 3D surface results
+  \033[2m--slice\033[0m       Interactive 2D slice view along activation thresholds
+  \033[2m--sweep\033[0m       Search for the best t_min/t_max limits
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-
 
     parser.add_argument("backlog_size", type=int, help="size of the backlog queue")
 
@@ -579,6 +601,13 @@ Notes:
         type=float,
         required=False,
         help="activation threshold of the mitigation. Defaults to 0.75 (or 3/4)",
+    )
+
+    parser.add_argument(
+        "--window_center",
+        type=float,
+        required=False,
+        help="threshold ratio used to center t_min/t_max limits automatically when they are not specified directly by the user. Defaults to act_thr if not given",
     )
 
     parser.add_argument(
@@ -612,6 +641,7 @@ Notes:
             args.backlog_size,
             sweep=args.sweep,
             act_thr=args.act_thr,
+            window_center=args.window_center,
             t_min=args.t_min,
             t_max=args.t_max,
         )
@@ -620,6 +650,7 @@ Notes:
             args.backlog_size,
             sweep=args.sweep,
             act_thr=args.act_thr,
+            window_center=args.window_center,
             t_min=args.t_min,
             t_max=args.t_max,
         )
@@ -628,16 +659,25 @@ Notes:
             args.backlog_size,
             sweep=args.sweep,
             act_thr=args.act_thr,
+            window_center=args.window_center,
             t_min=args.t_min,
             t_max=args.t_max,
         )
     elif args.sweep:
         results = sweep_window_sizes(
-            args.backlog_size, act_thr=args.act_thr, t_min=args.t_min, t_max=args.t_max
+            args.backlog_size,
+            act_thr=args.act_thr,
+            window_center=args.window_center,
+            t_min=args.t_min,
+            t_max=args.t_max,
         )
         print_results(results, title="Best Window From Sweep")
     else:
         results = calculate_probabilities(
-            args.backlog_size, args.act_thr, args.t_min, args.t_max
+            args.backlog_size,
+            act_thr=args.act_thr,
+            window_center=args.window_center,
+            t_min=args.t_min,
+            t_max=args.t_max,
         )
         print_results(results)
