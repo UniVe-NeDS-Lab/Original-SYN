@@ -78,13 +78,22 @@ Target not-alive classificato come alive, ovvero quando i pacchetti inviati non 
 $$n(\text{FP}) = \sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1$$
 ### Occorrenze per i falsi negativi $n(F\;N)$
 Target alive classificato come not-alive, ovvero quando $T_{n-1}\ge \lfloor \frac{3}{8}B \rfloor$ (canary rimossi), quindi $\frac{1}{2}T_{n-1}\ge T_n\; \Rightarrow\; 2\cdot T_n\le T_{n-1}$, ovvero la threshold nuova è stata più che dimezzata per far apparire il target come non attivo andando a rimuovere i canary.
-La condizione $\frac{1}{2}T_{n-1}\ge T_n$ accade quando $T_{n-1}\in[\frac{3}{4}B, T_{n-1}]$, quindi i casi associati ad ogni stato $T_{n-1}$ sono $C_n-1-T_{min}(B)+1$ visto che i canary da inviare devono essere $\ge T_{min}(B)$ per causare un'eviction.
+La condizione $\frac{1}{2}T_{n-1}\ge T_n$ accade quando $T_{n-1}\in[\frac{3}{4}B, T_{n-1}]$, quindi i casi associati ad ogni stato $T_{n-1}$ sono $C_n-T_{min}(B)+1$ visto che i canary da inviare devono essere $\ge T_{min}(B)$ per causare un'eviction.
 $$
 \begin{aligned}
 n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} (C_w - T_{\min}(B) + 1) \\ \\
 &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} \left( \frac{1}{2}w - T_{\min}(B) + 1 \right)
 \end{aligned}
 $$
+Sperimentando con alcuni valori scelti manualmente per $T_{min}(B)$ e $T_{max}(B)$ è emerso un piccolo problema da sistemare, essendo che possiamo rientrare in condizioni in cui $\frac{1}{2}w$, ovvero il numero di canary, sia inferiore alla threshold minima. Questo ci farebbe ottenere dei numeri negativi all'interno della sommatoria quando, invece, dovremmo ottenere $0$ visto il fatto che non potrebbe mai avvenire un'eviction essendo sotto la soglia minima possibile. La formula risistemata è quindi:
+$$
+\begin{aligned}
+n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right) \\
+&= \sum_{w = \left\lfloor act\_thr\cdot  B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right) \\
+\end{aligned}
+$$
+-> l'ultima formula è stata riadattata per usare una soglia di attivazione specificata dall'utente
+
 ### Occorrenze per i veri positivi $n(T\;P)$
 $$
 w(B)^2 - n(F\;P)
@@ -98,10 +107,11 @@ $$
 ### Riassumendo le formule
 Di seguito una tabella riassuntiva come riportato nella tesi
 
-|                      | **Classificazione Alive**                                                   | **Classificazione Not-Alive**                                                                                                 |
-| -------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **Target Alive**     | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                           | $\frac{\sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} \left( \frac{1}{2}w - T_{\min}(B) + 1 \right)}{w(B)^2}$ |
-| **Target Not-Alive** | $\frac{\sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1}{w(B)^2}$ | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                                                                             |
+|                      | **Classificazione Alive**                                                   | **Classificazione Not-Alive**                                                                                                             |
+| -------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Target Alive**     | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                           | $\frac{\sum_{w = \left\lfloor act\_thr\cdot  B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right)}{w(B)^2}$ |
+| **Target Not-Alive** | $\frac{\sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1}{w(B)^2}$ | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                                                                                         |
+
 
   ---
 

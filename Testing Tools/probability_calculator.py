@@ -15,6 +15,11 @@ def calculate_default_limits(backlog_size, act_thr, window_ratio=3/8):
     
     t_min = math.floor(center - half_window)
     t_max = math.floor(center + half_window) + 1
+
+    if t_min < 0:
+        t_max += t_min
+        t_min = 0
+
     return t_min, t_max
 
 
@@ -55,8 +60,8 @@ def calculate_probabilities(backlog_size, act_thr=None, t_min=None, t_max=None):
     n_fn = 0
     start_w = math.floor(act_thr * backlog_size)
     for w in range(start_w, t_max + 1):
-        n_fn += 1 / 2 * w - t_min + 1
-    n_fn = math.ceil(n_fn)
+        n_fn += max(0, 1 / 2 * w - t_min + 1)
+    n_fn = math.floor(n_fn)
 
     # occurrences of true positives and true negatives
     n_tp = total_sample_space - n_fn
@@ -73,7 +78,17 @@ def calculate_probabilities(backlog_size, act_thr=None, t_min=None, t_max=None):
         or n_tp > total_sample_space
         or n_tn > total_sample_space
     ):
-        return None
+        raise Exception(
+f"""Invalid values were calculated:
+n_fp: {n_fp} (should be >= 0)
+n_fn: {n_fn} (should be >= 0)
+n_tp: {n_tp} (should be >= 0)
+n_tn: {n_tn} (should be >= 0)
+n_fp: {n_fp} (should be <= {total_sample_space})
+n_fn: {n_fn} (should be <= {total_sample_space})
+n_tp: {n_tp} (should be <= {total_sample_space})
+n_tn: {n_tn} (should be <= {total_sample_space})
+""")
 
 
     # probabilities
@@ -304,7 +319,7 @@ def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, t_min=Non
         start_size = t_max
 
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
-    act_thrs = np.linspace(0.1, 0.9, 20) if act_thr is None else [act_thr]
+    act_thrs = np.linspace(0.01, 0.99, 50) if act_thr is None else [act_thr]
 
     B, A = np.meshgrid(backlog_sizes, act_thrs)
     Z_tp = np.full_like(B, np.nan, dtype=float)
@@ -382,8 +397,8 @@ def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, t_min=None, t_max
     slider = Slider(
         ax=ax_slider,
         label="Activation Thr",
-        valmin=0.05,
-        valmax=0.95,
+        valmin=0.01,
+        valmax=0.99,
         valinit=initial_thr,
         valstep=0.01,
     )
@@ -488,7 +503,10 @@ def print_results(results, title="Calculation Results"):
 
 if __name__ == "__main__":
     # results = calculate_probabilities(
-    #     64, 1/4, # 0, 0
+    #         30, 3/4
+    #     )
+    # results = calculate_probabilities(
+    #     1, 3/4, 0, 0
     # )
     # print_results(results)
 
