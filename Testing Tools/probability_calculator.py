@@ -503,9 +503,12 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
                     size, act_thr=curr_thr
                 )
             elif is_spec_t:
-                res = calculate_probabilities(
-                    size, act_thr=curr_thr, t_min=curr_t_min, t_max=curr_t_max
-                )
+                if size < curr_t_max:
+                    res = None
+                else:
+                    res = calculate_probabilities(
+                        size, act_thr=curr_thr, t_min=curr_t_min, t_max=curr_t_max
+                    )
             else:
                 res = calculate_probabilities(
                     size, act_thr=curr_thr, window_center=curr_center
@@ -548,6 +551,7 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
     check.on_clicked(update)
     update(None)
     plt.show()
+
 
 def print_results(results, title="Calculation Results"):
     if not results:
