@@ -383,10 +383,10 @@ def plot_probabilities_3d(max_backlog_size, sweep=False, act_thr=None, window_ce
     plt.show()
 
 
-def plot_slice_2d(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
+def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None, t_min=None, t_max=None):
     """
-    Interactive 2D slice tool. Uses a Matplotlib slider to slice 
-    through activation thresholds and plot 2D probability curves dynamically.
+    Uses a Matplotlib sliders to "slice" through activation thresholds of the 3D plot in order 
+    to plot the 2D probability curves dynamically
     """
     fig, ax = plt.subplots(figsize=(10, 6))
     plt.subplots_adjust(bottom=0.20)
@@ -567,14 +567,14 @@ Examples:
      python3 probability_calculator.py 32 --plot_3d
      python3 probability_calculator.py 32 --plot_3d --sweep
 
-  \033[1;36m9. Interactive 2D slice tool with a slider for activation thresholds\033[0m
-     python3 probability_calculator.py 64 --slice
-     python3 probability_calculator.py 64 --slice --sweep
+  \033[1;36m9. Interactive 2D slice tool with sliders for activation thresholds and automatic centering for t_min/t_max (this last feature is not available when using the sweep function) \033[0m
+     python3 probability_calculator.py 64 --sliders
+     python3 probability_calculator.py 64 --sliders --sweep
 
 Notes:
   \033[2m--plot\033[0m        Plot the 2D results
   \033[2m--plot_3d\033[0m     Plot the 3D surface results
-  \033[2m--slice\033[0m       Interactive 2D slice view along activation thresholds
+  \033[2m--sliders\033[0m     Interactive 2D view along sliders to change the values
   \033[2m--sweep\033[0m       Search for the best t_min/t_max limits
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -629,9 +629,9 @@ Notes:
     )
 
     parser.add_argument(
-        "--slice",
+        "--sliders",
         action="store_true",
-        help="Open an interactive 2D slice tool with a slider for activation thresholds",
+        help="Open an interactive plot tool with sliders for activation thresholds",
     )
 
     args = parser.parse_args()
@@ -645,8 +645,8 @@ Notes:
             t_min=args.t_min,
             t_max=args.t_max,
         )
-    elif args.slice:
-        plot_slice_2d(
+    elif args.sliders:
+        plot_sliders(
             args.backlog_size,
             sweep=args.sweep,
             act_thr=args.act_thr,
