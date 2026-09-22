@@ -20,6 +20,13 @@ def calculate_default_limits(backlog_size, window_center, window_ratio=3/8):
         t_max += t_min
         t_min = 0
 
+    if t_max > backlog_size:
+        t_min -= (t_max - backlog_size)
+        t_max = backlog_size
+
+    t_min = max(0, t_min)
+    # t_max = min(t_max, backlog_size)
+
     return t_min, t_max
 
 
@@ -32,7 +39,7 @@ def calculate_probabilities(backlog_size, act_thr=None, window_center=None, t_mi
     """
 
     if act_thr is None:
-        act_thr = 3/4
+        act_thr = 18/32
         
     if window_center is None:
         window_center = act_thr
@@ -396,7 +403,7 @@ def plot_sliders(max_backlog_size, sweep=False, act_thr=None, window_center=None
 
     start_size = 1
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
-    initial_thr = act_thr if act_thr is not None else 0.75
+    initial_thr = act_thr if act_thr is not None else 18/32
     initial_center = window_center if window_center is not None else initial_thr
     initial_t_min = t_min if t_min is not None else 0
     initial_t_max = t_max if t_max is not None else max_backlog_size
