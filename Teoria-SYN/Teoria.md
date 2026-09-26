@@ -2,7 +2,9 @@ Raccolta di formule estratte dalla tesi al fine di effettuare l'analisi statisti
 ## Miscellaneous 
 #### Pacchetti SYN per arrivare alla threshold
 Calcola il numero di pacchetti SYN inviati dall'attaccante per riempire la coda:
-$$N = \frac{3}{4} \cdot B_{\text{guess}}$$
+$$
+N = \frac{3}{4} \cdot B_{\text{guess}}
+$$
 - **$N$**: Numero totale di pacchetti inviati.
 - **$B_{\text{guess}}$**: Dimensione presunta (assunta dall'attaccante) del backlog (coda).
 
@@ -14,9 +16,13 @@ $$N = \frac{3}{4} \cdot B_{\text{guess}}$$
 
 ## Formule usate per la scelta della soglia nel Kernel
 #### Limite inferiore soglia
-$$\text{base\_threshold} = \text{backlog\_size} \cdot \frac{3}{8}$$
+$$
+\text{base\_threshold} = \text{backlog\_size} \cdot \frac{3}{8}
+$$
 #### Range di estrazione della soglia
-$$\text{range} = \left(\text{backlog\_size} \cdot \frac{6}{8}\right) + 1 - \text{base\_threshold}$$
+$$
+\text{range} = \left(\text{backlog\_size} \cdot \frac{6}{8}\right) + 1 - \text{base\_threshold}
+$$
 #### Estrazione effettiva
 Calcolo della nuova soglia di _eviction_ casuale per contrastare l'inferenza dell'attaccante:
 $$\text{sk\_max\_ack\_backlog\_custom} = (\text{random\_num} \bmod (\text{range} + 1)) + \text{base\_threshold}$$
@@ -121,7 +127,16 @@ Al fine di trovare dei valori per le soglie della window, possiamo fare uno swee
 Al fine di fare la scelta che più permette a tutte le probabilità di avvicinarsi al $50\%$, possiamo minimizzare la "distanza" che ogni probabilità ha da $0.5$, ovvero minimizzando $\sum_{probabilities} (p-0.5)^2$
 
 Otteniamo quindi il seguente grafico, il quale illustra come aumentare la backlog size vada a far avvicinare al $50\%$ le probabilità per un client effettivamente not-alive, mentre un client alive diventa mano a mano sempre più evidente all'attaccante del fatto che sia attivo. Questo è riflesso anche dai calcoli analitici e sperimentali effettuati dalla tesi.
-![[PlotProbVsBacklog.png]]
+![Plot probabilità per ogni backlog size richiesta in sweep mode](PlotProbVsBacklog.png)
 
+### Analisi più approfondita dei grafici ottenuti
 Esaminando manualmente con ulteriore libertà nella scelta dei parametri, possiamo notare che impostare un'activation threshold praticamente pari a $0$ (mitigazione sempre attiva), possiamo notare come i valori che rendono le probabilità più vicine al $50\%$ siano di $T_{min}=0$ e $T_{max}\approx 4$.
-![[ProbabilitiesTo50.mp4]]
+![Video prova diversi parametri](ProbabilitiesTo50.mp4)
+
+Come possiamo notare: 
+- al tempo `0:10` abbiamo che le dimensioni della finestra entro cui facciamo la scelta della della nuova threshold sono impostate a $T_{min}=0$ e $T_{max}=34$ per tutte le possibili backlog size di cui possiamo fare il plot. 
+  Come si evince dal grafico, al crescere della dimensione del backlog la probabilità che l'attaccante identifichi una vittima attiva come tale cresce fino a raggiungere il valore di $1$. Questo accade perché la soglia di connessioni semi-aperte dettata dall'activation threshold si sta mano a mano "crescendo", essendo che sta venendo calcolata facendo $0.56\cdot backlogsize$. Questo implica che l'attaccante manderà un numero mano a mano maggiore di canary e connessioni spoofed, le quali verranno rimosse tramite i RST della vittima attiva lasciando esclusivamente i canary.
+- al tempo `0:12` vediamo come alzare $T_{min}$ allontani le probabilità per la vittima attiva dal $50\%$, cosa dovuta al fatto che stiamo inevitabilmente limitando il numero di connessioni che verranno droppate dal kernel a causa della scelta della soglia più alta
+- al tempo `0:20` vediamo che abbassare l'activation threshold permette di rendere le probabilità uguali per tutte le backlog size. Questo accade dato il fatto che la mitigazione verrà attiva prima ma, soprattutto, allo stesso superamento della soglia di attivazione della mitigazione che sarà tendente allo 0 per tutte le backlog size analizzate, quindi le probabilità poi calcolate saranno quasi identiche come conseguenza (basti guardare i limiti usati nelle sommatorie per notare che effettueremo lo stesso calcolo)
+- al tempo `0:32` notiamo un fatto più interessante, ovvero il fatto che le probabilità per una vittima attiva tendono a diminuire drasticamente fino ad apparentemente convergere per $T_{min}=0\;T_{max}=1$ (non riportato nel video). Questo non accade e lo possiamo verificare andando a plottare per backlog size più grandi, come fatto nella figura seguente
+  ![[ProbabilitiesTo1024.png]]
