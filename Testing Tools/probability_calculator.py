@@ -130,6 +130,68 @@ n_tn: {n_tn} (should be <= {total_sample_space})
     }
 
 
+def calculate_probabilities_timeout(
+    backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None
+):
+    """
+    Calculate the probabilities for the 'window_timeout' scenario using
+    the provided formula based on the window size w(B).
+    """
+    if act_thr is None:
+        act_thr = 18 / 32
+
+    if window_center is None:
+        window_center = act_thr
+
+    center_inop = t_min is not None and t_max is not None
+
+    default_t_min, default_t_max = calculate_default_limits(backlog_size, window_center)
+
+    if t_min is None:
+        t_min = default_t_min
+    if t_max is None:
+        t_max = default_t_max
+
+    if t_max < t_min:
+        return None
+
+    # window size
+    w_b = t_max - t_min + 1
+
+    # total sample space
+    total_sample_space = w_b**2
+
+    # probabilities derived directly from the formulas
+    p_tp = 0.5 - (1 / (2 * w_b))
+    p_fn = (1 / (2 * w_b)) + 0.5
+    p_fp = 0.5 - (1 / (2 * w_b))
+    p_tn = (1 / (2 * w_b)) + 0.5
+
+    # deriving the corresponding occurrences matching the sample space proportion
+    n_tp = int((w_b * (w_b - 1)) / 2)
+    n_fp = int((w_b * (w_b - 1)) / 2)
+    n_fn = int((w_b * (w_b + 1)) / 2)
+    n_tn = int((w_b * (w_b + 1)) / 2)
+
+    return {
+        "backlog_size": backlog_size,
+        "activation_threshold": act_thr,
+        "window_center": "INOP" if center_inop else window_center,
+        "T_min": t_min,
+        "T_max": t_max,
+        "window_size": w_b,
+        "total_sample_space": total_sample_space,
+        "n_fp": n_fp,
+        "n_fn": n_fn,
+        "n_tp": n_tp,
+        "n_tn": n_tn,
+        "p_fp": p_fp,
+        "p_fn": p_fn,
+        "p_tp": p_tp,
+        "p_tn": p_tn,
+    }
+
+
 def sweep_window_sizes(
     backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None
 ):
@@ -150,6 +212,66 @@ def sweep_window_sizes(
             if tx <= tm:
                 continue
             result = calculate_probabilities(
+                backlog_size,
+                act_thr=act_thr,
+                window_center=window_center,
+                t_min=tm,
+                t_max=tx,
+            )
+            if result is None:
+                continue
+            probabilities = [
+                result["p_fp"],
+                result["p_fn"],
+                result["p_tp"],
+                result["p_tn"],
+            ]
+
+            score = sum((p - 0.5) ** 2 for p in probabilities)
+
+            if score < best_score:
+                best_score = score
+                best_result = result.copy()
+
+    if best_result is None:
+        return None
+
+    best_result["score"] = best_score
+
+    # calculate some debug metrics
+    probabilities = [
+        best_result["p_fp"],
+        best_result["p_fn"],
+        best_result["p_tp"],
+        best_result["p_tn"],
+    ]
+    best_result["max_distance_from_0.5"] = max(abs(p - 0.5) for p in probabilities)
+    best_result["average_distance_from_0.5"] = sum(
+        abs(p - 0.5) for p in probabilities
+    ) / len(probabilities)
+
+    return best_result
+
+
+def sweep_window_sizes_timeout(
+    backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None
+):
+    """
+    Sweep for the window_timeout scenario, returning the values that
+    make the 4 probabilities as close to 0.5 as possible
+    """
+    best_result = None
+    best_score = float("inf")
+
+    t_min_range = [t_min] if t_min is not None else range(0, backlog_size + 1)
+
+    # for all possible combinations
+    for tm in t_min_range:
+        t_max_range = [t_max] if t_max is not None else range(tm + 1, backlog_size + 1)
+        for tx in t_max_range:
+            if tx <= tm:
+                continue
+            result = calculate_probabilities_timeout(
                 backlog_size,
                 act_thr=act_thr,
                 window_center=window_center,
@@ -235,6 +357,7 @@ def add_hover_annotation(fig, ax, lines, get_res_fn):
 
 def plot_probabilities(
     max_backlog_size,
+    scenario="window",
     sweep=False,
     act_thr=None,
     window_center=None,
@@ -252,6 +375,7 @@ def plot_probabilities(
                   and plotting the result
     """
     start_size = 1
+    scen_data = SCENARIOS[scenario]
 
     # when not sweeping and if the t_max argument has been specified,
     # values that are unreasonable, i.e. t_max that is bigger than
@@ -266,7 +390,7 @@ def plot_probabilities(
 
     for size in backlog_sizes:
         if sweep:
-            res = sweep_window_sizes(
+            res = scen_data["sweep_fn"](
                 size,
                 act_thr=act_thr,
                 window_center=window_center,
@@ -274,7 +398,7 @@ def plot_probabilities(
                 t_max=t_max,
             )
         else:
-            res = calculate_probabilities(
+            res = scen_data["calc_fn"](
                 size,
                 act_thr=act_thr,
                 window_center=window_center,
@@ -338,14 +462,14 @@ def plot_probabilities(
     title_act_thr = act_thr if act_thr is not None else "Default"
     if sweep:
         plt.title(
-            f"Probabilities vs Backlog Size (Sweep, Threshold={title_act_thr})",
+            f"[{scen_data['title']}] Probabilities vs Backlog Size (Sweep, Threshold={title_act_thr})",
             fontsize=14,
         )
     else:
         title_t_min = t_min if t_min is not None else "Dynamic"
         title_t_max = t_max if t_max is not None else "Dynamic"
         plt.title(
-            f"Probabilities vs Backlog Size (T_min={title_t_min}, T_max={title_t_max}, Threshold={title_act_thr})",
+            f"[{scen_data['title']}] Probabilities vs Backlog Size (T_min={title_t_min}, T_max={title_t_max}, Threshold={title_act_thr})",
             fontsize=14,
         )
 
@@ -360,6 +484,7 @@ def plot_probabilities(
 
 def plot_probabilities_3d(
     max_backlog_size,
+    scenario="window",
     sweep=False,
     act_thr=None,
     window_center=None,
@@ -371,6 +496,8 @@ def plot_probabilities_3d(
     sizes and activation thresholds.
     """
     start_size = 1
+    scen_data = SCENARIOS[scenario]
+
     if t_max is not None and not sweep:
         start_size = t_max
 
@@ -386,11 +513,11 @@ def plot_probabilities_3d(
     for i, a in enumerate(act_thrs):
         for j, b in enumerate(backlog_sizes):
             if sweep:
-                res = sweep_window_sizes(
+                res = scen_data["sweep_fn"](
                     b, act_thr=a, window_center=window_center, t_min=t_min, t_max=t_max
                 )
             else:
-                res = calculate_probabilities(
+                res = scen_data["calc_fn"](
                     b, act_thr=a, window_center=window_center, t_min=t_min, t_max=t_max
                 )
 
@@ -421,7 +548,7 @@ def plot_probabilities_3d(
     ax.set_zlim(-0.05, 1.05)
 
     title_mode = "Sweep" if sweep else "Dynamic/Fixed Limits"
-    ax.set_title(f"3D Probabilities ({title_mode})", fontsize=14)
+    ax.set_title(f"[{scen_data['title']}] 3D Probabilities ({title_mode})", fontsize=14)
     ax.legend(handles=legend_elements, fontsize=10)
     plt.tight_layout()
     plt.show()
@@ -429,6 +556,7 @@ def plot_probabilities_3d(
 
 def plot_sliders(
     max_backlog_size,
+    scenario="window",
     sweep=False,
     act_thr=None,
     window_center=None,
@@ -442,6 +570,7 @@ def plot_sliders(
     fig, ax = plt.subplots(figsize=(10, 6))
     plt.subplots_adjust(bottom=0.35)
 
+    scen_data = SCENARIOS[scenario]
     start_size = 1
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
     initial_thr = act_thr if act_thr is not None else 18 / 32
@@ -551,16 +680,16 @@ def plot_sliders(
 
         for size in backlog_sizes:
             if is_sweep:
-                res = sweep_window_sizes(size, act_thr=curr_thr)
+                res = scen_data["sweep_fn"](size, act_thr=curr_thr)
             elif is_spec_t:
                 if size < curr_t_max:
                     res = None
                 else:
-                    res = calculate_probabilities(
+                    res = scen_data["calc_fn"](
                         size, act_thr=curr_thr, t_min=curr_t_min, t_max=curr_t_max
                     )
             else:
-                res = calculate_probabilities(
+                res = scen_data["calc_fn"](
                     size, act_thr=curr_thr, window_center=curr_center
                 )
 
@@ -590,7 +719,8 @@ def plot_sliders(
             mode_str = "Dynamic Limits"
 
         ax.set_title(
-            f"2D Slice ({mode_str}) - Activation Threshold: {curr_thr:.2f}", fontsize=14
+            f"[{scen_data['title']}] 2D Slice ({mode_str}) - Activation Threshold: {curr_thr:.2f}",
+            fontsize=14,
         )
         fig.canvas.draw_idle()
 
@@ -670,16 +800,25 @@ def print_results(results, title="Calculation Results"):
     print("--------------------------")
 
 
-if __name__ == "__main__":
-    # results = calculate_probabilities(
-    #         30, 3/4
-    #     )
-    # results = calculate_probabilities(
-    #     1, 3/4, 0, 0
-    # )
-    # print_results(results)
 
-    # exit()
+
+
+
+SCENARIOS = {
+    "window": {
+        "calc_fn": calculate_probabilities,
+        "sweep_fn": sweep_window_sizes,
+        "title": "Window",
+    },
+    "window_timeout": {
+        "calc_fn": calculate_probabilities_timeout,
+        "sweep_fn": sweep_window_sizes_timeout,
+        "title": "Window Timeout",
+    },
+}
+
+
+if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Calculate probabilities based on backlog size",
@@ -718,6 +857,9 @@ Examples:
      python3 probability_calculator.py 64 --sliders
      python3 probability_calculator.py 64 --sliders --sweep
 
+  \033[1;36m10. Run calculations with the alternate 'window_timeout' scenario\033[0m
+     python3 probability_calculator.py 32 --scenario window_timeout
+
 Notes:
   \033[2m--plot\033[0m        Plot the 2D results
   \033[2m--plot_3d\033[0m     Plot the 3D surface results
@@ -728,6 +870,14 @@ Notes:
     )
 
     parser.add_argument("backlog_size", type=int, help="size of the backlog queue")
+
+    parser.add_argument(
+        "--scenario",
+        type=str,
+        choices=["window", "window_timeout"],
+        default="window",
+        help='choose the calculation scenario (the default is "window")',
+    )
 
     parser.add_argument(
         "--t_min",
@@ -786,6 +936,7 @@ Notes:
     if args.plot_3d:
         plot_probabilities_3d(
             args.backlog_size,
+            scenario=args.scenario,
             sweep=args.sweep,
             act_thr=args.act_thr,
             window_center=args.window_center,
@@ -795,6 +946,7 @@ Notes:
     elif args.sliders:
         plot_sliders(
             args.backlog_size,
+            scenario=args.scenario,
             sweep=args.sweep,
             act_thr=args.act_thr,
             window_center=args.window_center,
@@ -804,6 +956,7 @@ Notes:
     elif args.plot:
         plot_probabilities(
             args.backlog_size,
+            scenario=args.scenario,
             sweep=args.sweep,
             act_thr=args.act_thr,
             window_center=args.window_center,
@@ -811,20 +964,25 @@ Notes:
             t_max=args.t_max,
         )
     elif args.sweep:
-        results = sweep_window_sizes(
+        results = SCENARIOS[args.scenario]["sweep_fn"](
             args.backlog_size,
             act_thr=args.act_thr,
             window_center=args.window_center,
             t_min=args.t_min,
             t_max=args.t_max,
         )
-        print_results(results, title="Best Window From Sweep")
+        print_results(
+            results,
+            title=f"Best Window From Sweep [{SCENARIOS[args.scenario]['title']}]",
+        )
     else:
-        results = calculate_probabilities(
+        results = SCENARIOS[args.scenario]["calc_fn"](
             args.backlog_size,
             act_thr=args.act_thr,
             window_center=args.window_center,
             t_min=args.t_min,
             t_max=args.t_max,
         )
-        print_results(results)
+        print_results(
+            results, title=f"Calculation Results [{SCENARIOS[args.scenario]['title']}]"
+        )
