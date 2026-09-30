@@ -2,6 +2,7 @@ import math
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.ticker import PercentFormatter
 from matplotlib.widgets import Slider, CheckButtons
 import numpy as np
 
@@ -33,6 +34,15 @@ def is_pct_val(val):
     if isinstance(val, str):
         val = float(val.rstrip("%")) / 100.0 if "%" in val else float(val)
     return isinstance(val, float) and val <= 1.0
+
+
+def format_pct(val, decimals=2):
+    """
+    Format a ratio (float value between 0 and 1) as a percentage
+    """
+    if val is None or val == "INOP":
+        return "INOP" if val == "INOP" else "None"
+    return f"{float(val) * 100:.{decimals}f}%"
 
 
 def calculate_default_limits(backlog_size, window_center, window_ratio=3 / 8):
@@ -381,8 +391,8 @@ def add_hover_annotation(fig, ax, lines, get_res_fn):
                             f"Backlog Size: {res['backlog_size']}\n"
                             f"Prob: {y:.4f}\n"
                             f"T_min: {res['T_min']}, T_max: {res['T_max']}\n"
-                            f"Act Thr: {res['activation_threshold']}\n"
-                            f"Window Center: {res.get('window_center', res['activation_threshold'])}"
+                            f"Act Thr: {format_pct(res['activation_threshold'])}\n"
+                            f"Window Center: {format_pct(res.get('window_center', res['activation_threshold']))}"
                         )
                         annot.set_text(text)
                         annot.set_visible(True)
@@ -499,7 +509,13 @@ def plot_probabilities(
         lambda i: results_list[i],
     )
 
-    title_act_thr = act_thr if act_thr is not None else "Default"
+    title_act_thr = format_pct(act_thr) if act_thr is not None else "Default"
+    if window_center is not None:
+        title_window_center = format_pct(window_center)
+    elif act_thr is not None:
+        title_window_center = format_pct(act_thr)
+    else:
+        title_window_center = "Default"
     if sweep:
         plt.title(
             f"[{scen_data['title']}] Probabilities vs Backlog Size (Sweep, Threshold={title_act_thr})",
@@ -509,7 +525,7 @@ def plot_probabilities(
         title_t_min = t_min if t_min is not None else "Dynamic"
         title_t_max = t_max if t_max is not None else "Dynamic"
         plt.title(
-            f"[{scen_data['title']}] Probabilities vs Backlog Size (T_min={title_t_min}, T_max={title_t_max}, Threshold={title_act_thr})",
+            f"[{scen_data['title']}] Probabilities vs Backlog Size (T_min={title_t_min}, T_max={title_t_max}, Threshold={title_act_thr}, Window Center={title_window_center})",
             fontsize=14,
         )
 
@@ -584,11 +600,22 @@ def plot_probabilities_3d(
 
     ax.set_xlabel("Backlog Size", fontsize=11)
     ax.set_ylabel("Activation Threshold", fontsize=11)
+    ax.yaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_zlabel("Probability", fontsize=11)
     ax.set_zlim(-0.05, 1.05)
 
     title_mode = "Sweep" if sweep else "Dynamic/Fixed Limits"
-    ax.set_title(f"[{scen_data['title']}] 3D Probabilities ({title_mode})", fontsize=14)
+    if window_center is not None:
+        title_center = format_pct(window_center)
+    elif act_thr is not None:
+        title_center = format_pct(act_thr)
+    else:
+        title_center = "Default"
+    ax.set_title(
+        f"[{scen_data['title']}] 3D Probabilities ({title_mode}) "
+        f"(Window Center={title_center})",
+        fontsize=14,
+    )
     ax.legend(handles=legend_elements, fontsize=10)
     plt.tight_layout()
     plt.show()
@@ -806,7 +833,9 @@ def plot_sliders(
             mode_str = "Dynamic Limits"
 
         ax.set_title(
-            f"[{scen_data['title']}] 2D Slice ({mode_str}) - Activation Threshold: {curr_thr:.2f}",
+            f"[{scen_data['title']}] 2D Slice ({mode_str}) - "
+            f"Activation Threshold: {format_pct(curr_thr)}, "
+            f"Window Center: {format_pct(curr_center)}",
             fontsize=14,
         )
         fig.canvas.draw_idle()
@@ -834,9 +863,9 @@ def print_results(results, title="Calculation Results"):
     print(f"--- {title} ---")
     print(f"Backlog Size: {results['backlog_size']}")
     if "activation_threshold" in results:
-        print(f"Activation Threshold: {results['activation_threshold']}")
+        print(f"Activation Threshold: {format_pct(results['activation_threshold'])}")
     if "window_center" in results:
-        print(f"Window Center: {results['window_center']}")
+        print(f"Window Center: {format_pct(results['window_center'])}")
     print(f"T_min: {results['T_min']}")
     print(f"T_max: {results['T_max']}")
     print(f"Window Size: {results['window_size']}")
