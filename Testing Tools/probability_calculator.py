@@ -729,6 +729,114 @@ def plot_probabilities_bayes(
     plt.tight_layout()
     plt.show()
 
+def plot_whiskers(
+    backlog_size,
+    scenario="window",
+    max_delta_pct=0.20,
+    t_min=None,
+    t_max=None,
+):
+    """
+    Plots probabilities against threshold percentage (X axis) with a shaded range (whisker/delta band)
+    obtained by sweeping T_min and T_max in [threshold - delta, threshold + delta] with delta up to 20%.
+    """
+    scen_data = SCENARIOS[scenario]
+    act_thrs = np.linspace(0.01, 0.99, 100)
+
+    nominal_tp, nominal_tn, nominal_fp, nominal_fn = [], [], [], []
+    min_tp, max_tp = [], []
+    min_tn, max_tn = [], []
+    min_fp, max_fp = [], []
+    min_fn, max_fn = [], []
+
+    for thr in act_thrs:
+        # Reminder that the act_thr will be used to center the window with 
+        # automatically calculated t_min/t_max values when not specified
+        res_nom = scen_data["calc_fn"](
+            backlog_size, act_thr=thr, t_min=t_min, t_max=t_max
+        )
+        if res_nom is not None:
+            nominal_tp.append(res_nom["p_tp"])
+            nominal_tn.append(res_nom["p_tn"])
+            nominal_fp.append(res_nom["p_fp"])
+            nominal_fn.append(res_nom["p_fn"])
+        else:
+            nominal_tp.append(np.nan)
+            nominal_tn.append(np.nan)
+            nominal_fp.append(np.nan)
+            nominal_fn.append(np.nan)
+
+        # Sweep bounds for t_min/t_max with ±20% of delta
+        lower_bound = max(0, int(math.floor((thr - max_delta_pct) * backlog_size)))
+        upper_bound = min(
+            backlog_size, int(math.ceil((thr + max_delta_pct) * backlog_size))
+        )
+
+        # Get samples for all the probabilities calculated with the various thresholds
+        tps, tns, fps, fns = [], [], [], []
+
+        for tm in range(lower_bound, upper_bound + 1):
+            for tx in range(tm + 1, upper_bound + 1):
+                res = scen_data["calc_fn"](
+                    backlog_size, act_thr=thr, t_min=tm, t_max=tx
+                )
+                if res is not None:
+                    tps.append(res["p_tp"])
+                    tns.append(res["p_tn"])
+                    fps.append(res["p_fp"])
+                    fns.append(res["p_fn"])
+
+        min_tp.append(min(tps))
+        max_tp.append(max(tps))
+        min_tn.append(min(tns))
+        max_tn.append(max(tns))
+        min_fp.append(min(fps))
+        max_fp.append(max(fps))
+        min_fn.append(min(fns))
+        max_fn.append(max(fns))
+
+    x_pct = act_thrs * 100
+
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(x_pct, nominal_tp, label="True Positives P(TP)", color="green", linewidth=2)
+    plt.fill_between(x_pct, min_tp, max_tp, color="green", alpha=0.2)
+
+    plt.plot(x_pct, nominal_tn, label="True Negatives P(TN)", color="blue", linewidth=2)
+    plt.fill_between(x_pct, min_tn, max_tn, color="blue", alpha=0.2)
+
+    plt.plot(
+        x_pct,
+        nominal_fp,
+        label="False Positives P(FP)",
+        color="orange",
+        linewidth=2,
+        linestyle="--",
+    )
+    plt.fill_between(x_pct, min_fp, max_fp, color="orange", alpha=0.2)
+
+    plt.plot(
+        x_pct,
+        nominal_fn,
+        label="False Negatives P(FN)",
+        color="red",
+        linewidth=2,
+        linestyle="--",
+    )
+    plt.fill_between(x_pct, min_fn, max_fn, color="red", alpha=0.2)
+
+    plt.title(
+        f"[{scen_data['title']}] Probabilities vs Threshold Percentage\n"
+        f"(Backlog Size={backlog_size}, Delta=±20%)",
+        fontsize=14,
+    )
+    plt.xlabel("Activation Threshold (%)", fontsize=12)
+    plt.ylabel("Probability", fontsize=12)
+    plt.ylim(-0.05, 1.05)
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend(fontsize=11)
+    plt.tight_layout()
+    plt.show()
 
 def plot_probabilities_3d(
     max_backlog_size,
@@ -1205,6 +1313,10 @@ Examples:
      python3 probability_calculator.py 32 --bayes_base_prob 0.5%
      python3 probability_calculator.py 32 --plot_bayes --bayes_base_prob 0.005
 
+  \033[1;36m12. Plot the graph with whiskers, i.e. the one that shows the probability change for the possible t_min/t_max vaules in a delta and all possible activation thresholds\033[0m
+     python3 probability_calculator.py 128 --plot_whiskers
+     python3 probability_calculator.py 128 --plot_whiskers --scenario window_timeout
+
 Notes:
   \033[2m--plot\033[0m            Plot the 2D results
   \033[2m--plot_3d\033[0m         Plot the 3D surface results
@@ -1266,6 +1378,12 @@ Notes:
     )
 
     parser.add_argument(
+        "--plot_whiskers",
+        action="store_true",
+        help="Plot probabilities vs threshold percentage with a sweep between ±20%% of delta for T_min/T_max",
+    )
+
+    parser.add_argument(
         "--plot_bayes",
         action="store_true",
         help="Plot the probabilities from the attacker's perspective (Bayesian ones)",
@@ -1320,6 +1438,13 @@ Notes:
             sweep=args.sweep,
             act_thr=args.act_thr,
             window_center=args.window_center,
+            t_min=args.t_min,
+            t_max=args.t_max,
+        )
+    elif args.plot_whiskers:
+        plot_whiskers(
+            args.backlog_size,
+            scenario=args.scenario,
             t_min=args.t_min,
             t_max=args.t_max,
         )
