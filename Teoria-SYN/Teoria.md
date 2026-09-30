@@ -33,7 +33,9 @@ $$\text{sk\_max\_ack\_backlog\_custom} = (\text{random\_num} \bmod (\text{range}
 
 ## Analisi probabilistica (capitolo 4.2)
 ### Probabilità di selezione una soglia uguale
-$$P_s = \frac{1}{\left(\frac{6}{8} - \frac{3}{8}\right) \cdot \text{backlog\_size} + 2} = \frac{1}{\frac{3}{8} \cdot \text{backlog\_size} + 2}$$
+$$
+P_s = \frac{1}{\left(\frac{6}{8} - \frac{3}{8}\right) \cdot \text{backlog\_size} + 2} = \frac{1}{\frac{3}{8} \cdot \text{backlog\_size} + 2}
+$$
 
   
 ### Valori limite per la soglia di eviction
@@ -85,19 +87,23 @@ $$n(\text{FP}) = \sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1$$
 ### Occorrenze per i falsi negativi $n(F\;N)$
 Target alive classificato come not-alive, ovvero quando $T_{n-1}\ge \lfloor \frac{3}{8}B \rfloor$ (canary rimossi), quindi $\frac{1}{2}T_{n-1}\ge T_n\; \Rightarrow\; 2\cdot T_n\le T_{n-1}$, ovvero la threshold nuova è stata più che dimezzata per far apparire il target come non attivo andando a rimuovere i canary.
 La condizione $\frac{1}{2}T_{n-1}\ge T_n$ accade quando $T_{n-1}\in[\frac{3}{4}B, T_{n-1}]$, quindi i casi associati ad ogni stato $T_{n-1}$ sono $C_n-T_{min}(B)+1$ visto che i canary da inviare devono essere $\ge T_{min}(B)$ per causare un'eviction.
+
 $$
 \begin{aligned}
 n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} (C_w - T_{\min}(B) + 1) \\ \\
 &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} \left( \frac{1}{2}w - T_{\min}(B) + 1 \right)
 \end{aligned}
 $$
+
 Sperimentando con alcuni valori scelti manualmente per $T_{min}(B)$ e $T_{max}(B)$ è emerso un piccolo problema da sistemare, essendo che possiamo rientrare in condizioni in cui $\frac{1}{2}w$, ovvero il numero di canary, sia inferiore alla threshold minima. Questo ci farebbe ottenere dei numeri negativi all'interno della sommatoria quando, invece, dovremmo ottenere $0$ visto il fatto che non potrebbe mai avvenire un'eviction essendo sotto la soglia minima possibile. La formula risistemata è quindi:
+
 $$
 \begin{aligned}
 n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right) \\
 &= \sum_{w = \left\lfloor act\_thr\cdot  B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right) \\
 \end{aligned}
 $$
+
 -> l'ultima formula è stata riadattata per usare una soglia di attivazione specificata dall'utente
 
 ### Occorrenze per i veri positivi $n(T\;P)$
@@ -113,10 +119,11 @@ $$
 ### Riassumendo le formule
 Di seguito una tabella riassuntiva come riportato nella tesi
 
-|                      | **Classificazione Alive**                                                   | **Classificazione Not-Alive**                                                                                                             |
-| -------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Target Alive**     | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                           | $\frac{\sum_{w = \left\lfloor act\_thr\cdot  B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right)}{w(B)^2}$ |
-| **Target Not-Alive** | $\frac{\sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1}{w(B)^2}$ | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                                                                                         |
+|                      | **Classificazione Alive**                                                   | **Classificazione Not-Alive**                                                                                                           |
+| -------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Target Alive**     | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                           | $\frac{\sum_{w = \left\lfloor act\_thr\cdot  B \right\rfloor}^{T_{\max}} \max\left( 0, \frac{1}{2}w - T_{\min}(B) + 1 \right)}{w(B)^2}$ |
+| **Target Not-Alive** | $\frac{\sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1}{w(B)^2}$ | $\frac{w(B)^2 - n(F\;N)}{w(B)^2}$                                                                                                       |
+
 
 
   ---
@@ -139,4 +146,4 @@ Come possiamo notare:
 - al tempo `0:12` vediamo come alzare $T_{min}$ allontani le probabilità per la vittima attiva dal $50\%$, cosa dovuta al fatto che stiamo inevitabilmente limitando il numero di connessioni che verranno droppate dal kernel a causa della scelta della soglia più alta
 - al tempo `0:20` vediamo che abbassare l'activation threshold permette di rendere le probabilità uguali per tutte le backlog size. Questo accade dato il fatto che la mitigazione verrà attiva prima ma, soprattutto, allo stesso superamento della soglia di attivazione della mitigazione che sarà tendente allo 0 per tutte le backlog size analizzate, quindi le probabilità poi calcolate saranno quasi identiche come conseguenza (basti guardare i limiti usati nelle sommatorie per notare che effettueremo lo stesso calcolo)
 - al tempo `0:32` notiamo un fatto più interessante, ovvero il fatto che le probabilità per una vittima attiva tendono a diminuire drasticamente fino ad apparentemente convergere per $T_{min}=0\;T_{max}=1$ (non riportato nel video). Questo non accade e lo possiamo verificare andando a plottare per backlog size più grandi, come fatto nella figura seguente
-  ![[ProbabilitiesTo1024.png]]
+  ![Divergenza probabilità fino a 1024](ProbabilitiesTo1024.png)
