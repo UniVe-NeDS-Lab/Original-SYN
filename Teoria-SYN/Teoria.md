@@ -18,23 +18,20 @@ $$
 
 ## Formule usate per la scelta della soglia nel Kernel
 #### Limite inferiore soglia
-
-$$
-\text{base\_threshold} = \text{backlog\\\_size} \cdot \frac{3}{8}
-$$
+```math
+\text{base\_threshold} = \text{backlog\_size} \cdot \frac{3}{8}
+```
 
 #### Range di estrazione della soglia
-
-$$
-\text{range} = \left(\text{backlog\\\_size} \cdot \frac{6}{8}\right) + 1 - \text{base\_threshold}
-$$
+```math
+\text{range} = \left(\text{backlog\_size} \cdot \frac{6}{8}\right) + 1 - \text{base\_threshold}
+```
 
 #### Estrazione effettiva
 Calcolo della nuova soglia di _eviction_ casuale per contrastare l'inferenza dell'attaccante:
-
-$$
-\text{sk\_max\_ack\_backlog\_custom} = (\text{random\\\_num} \bmod (\text{range} + 1)) + \text{base\_threshold}
-$$
+```math
+\text{sk\_max\_ack\_backlog\_custom} = (\text{random\_num} \bmod (\text{range} + 1)) + \text{base\_threshold}
+```
 
 -> è tutto documentato direttamente nel codice in `Vagrant/zombie_files/kernel/net/ipv4/inet_connection_sock.c` a riga 1192.
   
@@ -43,14 +40,12 @@ $$
 
 ## Analisi probabilistica (capitolo 4.2)
 ### Probabilità di selezione una soglia uguale
-
-$$
-P_s = \frac{1}{\left(\frac{6}{8} - \frac{3}{8}\right) \cdot \text{backlog\_size} + 2} = \frac{1}{\frac{3}{8} \cdot \text{backlog\\\_size} + 2}
-$$
+```math
+P_s = \frac{1}{\left(\frac{6}{8} - \frac{3}{8}\right) \cdot \text{backlog\_size} + 2} = \frac{1}{\frac{3}{8} \cdot \text{backlog\_size} + 2}
+```
 
   
 ### Valori limite per la soglia di eviction
-
 $$
 T_{\min}(B) = \left\lfloor \frac{3}{8} B \right\rfloor \quad \text{e} \quad T_{\max}(B) = \left\lfloor \frac{6}{8} B \right\rfloor + 1
 $$
@@ -64,7 +59,6 @@ $$w(B) = T_{\max}(B) - T_{\min}(B) + 1$$
   
 ### Spazio campionario totale
 Scelta del kernel per scelta dell'attaccante. 
-
 $$
 \text{Spazio Campionario Totale} = w(B)^2
 $$
@@ -74,7 +68,6 @@ $$
 
 ### Numero di pacchetti inviati a tempo $n$
 Inviamo lo stesso numero di pacchetti canary e di connessioni spoofed, quindi:
-
 $$
 C_n = S_n = \frac{3}{4} B \cdot \frac{1}{2} = \left(\frac{3}{4} B\right ) \cdot \frac{1}{2} = \left( T_{n-1} \right) \cdot \frac{1}{2}
 $$
@@ -110,7 +103,6 @@ $$n(\text{FP}) = \sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1$$
 ### Occorrenze per i falsi negativi $n(F\;N)$
 Target alive classificato come not-alive, ovvero quando $T_{n-1}\ge \lfloor \frac{3}{8}B \rfloor$ (canary rimossi), quindi $\frac{1}{2}T_{n-1}\ge T_n\; \Rightarrow\; 2\cdot T_n\le T_{n-1}$, ovvero la threshold nuova è stata più che dimezzata per far apparire il target come non attivo andando a rimuovere i canary.
 La condizione $\frac{1}{2}T_{n-1}\ge T_n$ accade quando $T_{n-1}\in[\frac{3}{4}B, T_{n-1}]$, quindi i casi associati ad ogni stato $T_{n-1}$ sono $C_n-T_{min}(B)+1$ visto che i canary da inviare devono essere $\ge T_{min}(B)$ per causare un'eviction.
-
 $$
 \begin{aligned}
 n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} (C_w - T_{\min}(B) + 1) \\ \\
@@ -119,7 +111,6 @@ n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} (
 $$
 
 Sperimentando con alcuni valori scelti manualmente per $T_{min}(B)$ e $T_{max}(B)$ è emerso un piccolo problema da sistemare, essendo che possiamo rientrare in condizioni in cui $\frac{1}{2}w$, ovvero il numero di canary, sia inferiore alla threshold minima. Questo ci farebbe ottenere dei numeri negativi all'interno della sommatoria quando, invece, dovremmo ottenere $0$ visto il fatto che non potrebbe mai avvenire un'eviction essendo sotto la soglia minima possibile. La formula risistemata è quindi:
-
 $$
 \begin{aligned}
 n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right) \\
@@ -157,11 +148,12 @@ Al fine di trovare dei valori per le soglie della window, possiamo fare uno swee
 Al fine di fare la scelta che più permette a tutte le probabilità di avvicinarsi al $50\%$, possiamo minimizzare la "distanza" che ogni probabilità ha da $0.5$, ovvero minimizzando $\sum_{probabilities} (p-0.5)^2$
 
 Otteniamo quindi il seguente grafico, il quale illustra come aumentare la backlog size vada a far avvicinare al $50\%$ le probabilità per un client effettivamente not-alive, mentre un client alive diventa mano a mano sempre più evidente all'attaccante del fatto che sia attivo. Questo è riflesso anche dai calcoli analitici e sperimentali effettuati dalla tesi.
-![Plot probabilità per ogni backlog size richiesta in sweep mode](PlotProbVsBacklog.png)
+![Plot probabilità per ogni backlog size richiesta in sweep mode](Immagini/PlotProbVsBacklog.png)
 
 ### Analisi più approfondita dei grafici ottenuti
 Esaminando manualmente con ulteriore libertà nella scelta dei parametri, possiamo notare che impostare un'activation threshold praticamente pari a $0$ (mitigazione sempre attiva), possiamo notare come i valori che rendono le probabilità più vicine al $50\%$ siano di $T_{min}=0$ e $T_{max}\approx 4$.
-![Video prova diversi parametri](ProbabilitiesTo50.mp4)
+
+![Video prova diversi parametri](Immagini/ProbabilitiesTo50.mp4)
 
 Come possiamo notare: 
 - al tempo `0:10` abbiamo che le dimensioni della finestra entro cui facciamo la scelta della della nuova threshold sono impostate a $T_{min}=0$ e $T_{max}=34$ per tutte le possibili backlog size di cui possiamo fare il plot. 
@@ -169,4 +161,4 @@ Come possiamo notare:
 - al tempo `0:12` vediamo come alzare $T_{min}$ allontani le probabilità per la vittima attiva dal $50\%$, cosa dovuta al fatto che stiamo inevitabilmente limitando il numero di connessioni che verranno droppate dal kernel a causa della scelta della soglia più alta
 - al tempo `0:20` vediamo che abbassare l'activation threshold permette di rendere le probabilità uguali per tutte le backlog size. Questo accade dato il fatto che la mitigazione verrà attiva prima ma, soprattutto, allo stesso superamento della soglia di attivazione della mitigazione che sarà tendente allo 0 per tutte le backlog size analizzate, quindi le probabilità poi calcolate saranno quasi identiche come conseguenza (basti guardare i limiti usati nelle sommatorie per notare che effettueremo lo stesso calcolo)
 - al tempo `0:32` notiamo un fatto più interessante, ovvero il fatto che le probabilità per una vittima attiva tendono a diminuire drasticamente fino ad apparentemente convergere per $T_{min}=0\;T_{max}=1$ (non riportato nel video). Questo non accade e lo possiamo verificare andando a plottare per backlog size più grandi, come fatto nella figura seguente
-  ![Divergenza probabilità fino a 1024](ProbabilitiesTo1024.png)
+  ![Divergenza probabilità fino a 1024](Immagini/ProbabilitiesTo1024.png)
