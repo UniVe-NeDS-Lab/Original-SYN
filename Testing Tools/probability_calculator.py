@@ -9,7 +9,7 @@ import numpy as np
 
 def parse_limit(val, backlog_size):
     """
-    Given the backlog size and the value to parse, calculate the actual 
+    Given the backlog size and the value to parse, calculate the actual
     number for it. E.g. for backlog_size=20:
      - val=0.1  -> ret 2
      - val=50%  -> ret 10
@@ -246,7 +246,11 @@ def calculate_bayes_probabilities(results, base_prob=0.5):
         return None
 
     if isinstance(base_prob, str):
-        base_prob = float(base_prob.rstrip("%")) / 100.0 if "%" in base_prob else float(base_prob)
+        base_prob = (
+            float(base_prob.rstrip("%")) / 100.0
+            if "%" in base_prob
+            else float(base_prob)
+        )
 
     p_tp = results["p_tp"]
     p_tn = results["p_tn"]
@@ -254,13 +258,13 @@ def calculate_bayes_probabilities(results, base_prob=0.5):
     p_fn = results["p_fn"]
 
     # How the probabilities are "arranged"
-    # 
+    #
     #                                - p_tp -> Classified Alive (TP)
     #                               /
     #      base_prob  ->   Alive   -
     #   /                           \
     #  /                             - p_fn -> Classified Not Alive (FN)
-    # - 
+    # -
     #  \                             - p_fp -> Classified Alive (FP)
     #   \                           /
     #     1-base_prob -> Not Alive -
@@ -268,21 +272,23 @@ def calculate_bayes_probabilities(results, base_prob=0.5):
     #                                - p_tn -> Classified Not Alive (TN)
 
     # Denominators
-    den_a =  (base_prob * p_tp) + ((1.0 - base_prob) * p_fp)
+    den_a = (base_prob * p_tp) + ((1.0 - base_prob) * p_fp)
     den_na = (base_prob * p_fn) + ((1.0 - base_prob) * p_tn)
 
     # P(Alive | Classified Alive)
-    results["b_p_aa"] = (p_tp * base_prob) / den_a if den_a > 0 else float('nan')
+    results["b_p_aa"] = (p_tp * base_prob) / den_a if den_a > 0 else float("nan")
     # P(Not Alive | Classified Alive)
-    results["b_p_naa"] = (p_fp * (1.0 - base_prob)) / den_a if den_a > 0 else float('nan')
+    results["b_p_naa"] = (
+        (p_fp * (1.0 - base_prob)) / den_a if den_a > 0 else float("nan")
+    )
     # P(Alive | Classified Not Alive)
-    results["b_p_ana"] = (p_fn * base_prob) / den_na if den_na > 0 else float('nan')
+    results["b_p_ana"] = (p_fn * base_prob) / den_na if den_na > 0 else float("nan")
     # P(Not Alive | Classified Not Alive)
-    results["b_p_nana"] = (p_tn * (1.0 - base_prob)) / den_na if den_na > 0 else float('nan')
+    results["b_p_nana"] = (
+        (p_tn * (1.0 - base_prob)) / den_na if den_na > 0 else float("nan")
+    )
 
     results["b_base_prob"] = base_prob
-
-    print(results)
 
     return results
 
@@ -588,6 +594,7 @@ def plot_probabilities(
     plt.tight_layout()
     plt.show()
 
+
 def plot_probabilities_bayes(
     max_backlog_size,
     scenario="window",
@@ -642,7 +649,7 @@ def plot_probabilities_bayes(
 
         valid_sizes.append(size)
         results_list.append(res)
-        
+
         b_p_aa.append(res["b_p_aa"])
         b_p_naa.append(res["b_p_naa"])
         b_p_ana.append(res["b_p_ana"])
@@ -698,7 +705,7 @@ def plot_probabilities_bayes(
         title_window_center = format_pct(act_thr)
     else:
         title_window_center = "Default"
-        
+
     if sweep:
         plt.title(
             f"[{scen_data['title']}] Attacker Inference (Bayes) vs Backlog Size\n"
@@ -721,6 +728,7 @@ def plot_probabilities_bayes(
     plt.legend(fontsize=11)
     plt.tight_layout()
     plt.show()
+
 
 def plot_probabilities_3d(
     max_backlog_size,
@@ -837,7 +845,9 @@ def plot_sliders(
         return float(v) if is_pct else parse_limit(v, max_backlog_size)
 
     initial_t_min = to_init_val(t_min, 0.0 if initial_is_pct else 0, initial_is_pct)
-    initial_t_max = to_init_val(t_max, 1.0 if initial_is_pct else max_backlog_size, initial_is_pct)
+    initial_t_max = to_init_val(
+        t_max, 1.0 if initial_is_pct else max_backlog_size, initial_is_pct
+    )
     initial_use_t = t_min is not None or t_max is not None
 
     (line_tp,) = ax.plot([], [], label="True Positives P(TP)", color="green", lw=2)
@@ -929,7 +939,7 @@ def plot_sliders(
         nonlocal current_results, prev_is_pct
         is_sweep, is_spec_t, is_pct = check.get_status()
 
-        if not is_spec_t: # disable T_min/T_max percentage toggle when not needed
+        if not is_spec_t:  # disable T_min/T_max percentage toggle when not needed
             if is_pct:
                 check.eventson = False
                 check.set_active(2)
@@ -944,8 +954,18 @@ def plot_sliders(
             if is_pct:
                 new_min = slider_t_min.val / max_backlog_size
                 new_max = slider_t_max.val / max_backlog_size
-                slider_t_min.valmin, slider_t_min.valmax, slider_t_min.valstep, slider_t_min.valfmt = 0.0, 1.0, 0.01, "%0.2f"
-                slider_t_max.valmin, slider_t_max.valmax, slider_t_max.valstep, slider_t_max.valfmt = 0.0, 1.0, 0.01, "%0.2f"
+                (
+                    slider_t_min.valmin,
+                    slider_t_min.valmax,
+                    slider_t_min.valstep,
+                    slider_t_min.valfmt,
+                ) = (0.0, 1.0, 0.01, "%0.2f")
+                (
+                    slider_t_max.valmin,
+                    slider_t_max.valmax,
+                    slider_t_max.valstep,
+                    slider_t_max.valfmt,
+                ) = (0.0, 1.0, 0.01, "%0.2f")
                 slider_t_min.ax.set_xlim(0.0, 1.0)
                 slider_t_max.ax.set_xlim(0.0, 1.0)
                 slider_t_min.set_val(new_min)
@@ -953,8 +973,18 @@ def plot_sliders(
             else:
                 new_min = int(round(slider_t_min.val * max_backlog_size))
                 new_max = int(round(slider_t_max.val * max_backlog_size))
-                slider_t_min.valmin, slider_t_min.valmax, slider_t_min.valstep, slider_t_min.valfmt = 0, max_backlog_size, 1, "%d"
-                slider_t_max.valmin, slider_t_max.valmax, slider_t_max.valstep, slider_t_max.valfmt = 0, max_backlog_size, 1, "%d"
+                (
+                    slider_t_min.valmin,
+                    slider_t_min.valmax,
+                    slider_t_min.valstep,
+                    slider_t_min.valfmt,
+                ) = (0, max_backlog_size, 1, "%d")
+                (
+                    slider_t_max.valmin,
+                    slider_t_max.valmax,
+                    slider_t_max.valstep,
+                    slider_t_max.valfmt,
+                ) = (0, max_backlog_size, 1, "%d")
                 slider_t_min.ax.set_xlim(0, max_backlog_size)
                 slider_t_max.ax.set_xlim(0, max_backlog_size)
                 slider_t_min.set_val(new_min)
@@ -1039,6 +1069,7 @@ def plot_sliders(
     update(None)
     plt.show()
 
+
 def print_results(results, title="Calculation Results"):
     if not results:
         print("No valid results found!")
@@ -1071,7 +1102,9 @@ def print_results(results, title="Calculation Results"):
 
     if "b_p_aa" in results:
         print("-" * 25)
-        print(f"--- Attacker Inference (Bayes, target alive with probability {results["b_base_prob"]*100}%) ---")
+        print(
+            f"--- Attacker Inference (Bayes, target alive with probability {results["b_base_prob"]*100}%) ---"
+        )
         print(f"P(Alive | Classified Alive):         {results['b_p_aa']:.6f}")
         print(f"P(Not Alive | Classified Alive):     {results['b_p_naa']:.6f}")
         print(f"P(Alive | Classified Not Alive):     {results['b_p_ana']:.6f}")
