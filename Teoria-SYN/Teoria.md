@@ -59,6 +59,7 @@ $$w(B) = T_{\max}(B) - T_{\min}(B) + 1$$
   
 ### Spazio campionario totale
 Scelta del kernel per scelta dell'attaccante. 
+
 $$
 \text{Spazio Campionario Totale} = w(B)^2
 $$
@@ -68,6 +69,7 @@ $$
 
 ### Numero di pacchetti inviati a tempo $n$
 Inviamo lo stesso numero di pacchetti canary e di connessioni spoofed, quindi:
+
 $$
 C_n = S_n = \frac{3}{4} B \cdot \frac{1}{2} = \left(\frac{3}{4} B\right ) \cdot \frac{1}{2} = \left( T_{n-1} \right) \cdot \frac{1}{2}
 $$
@@ -103,6 +105,7 @@ $$n(\text{FP}) = \sum_{w = T_{\min}}^{T_{\max}} \sum_{n = w+1}^{T_{\max}} 1$$
 ### Occorrenze per i falsi negativi $n(F\;N)$
 Target alive classificato come not-alive, ovvero quando $T_{n-1}\ge \lfloor \frac{3}{8}B \rfloor$ (canary rimossi), quindi $\frac{1}{2}T_{n-1}\ge T_n\; \Rightarrow\; 2\cdot T_n\le T_{n-1}$, ovvero la threshold nuova è stata più che dimezzata per far apparire il target come non attivo andando a rimuovere i canary.
 La condizione $\frac{1}{2}T_{n-1}\ge T_n$ accade quando $T_{n-1}\in[\frac{3}{4}B, T_{n-1}]$, quindi i casi associati ad ogni stato $T_{n-1}$ sono $C_n-T_{min}(B)+1$ visto che i canary da inviare devono essere $\ge T_{min}(B)$ per causare un'eviction.
+
 $$
 \begin{aligned}
 n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} (C_w - T_{\min}(B) + 1) \\ \\
@@ -111,6 +114,7 @@ n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} (
 $$
 
 Sperimentando con alcuni valori scelti manualmente per $T_{min}(B)$ e $T_{max}(B)$ è emerso un piccolo problema da sistemare, essendo che possiamo rientrare in condizioni in cui $\frac{1}{2}w$, ovvero il numero di canary, sia inferiore alla threshold minima. Questo ci farebbe ottenere dei numeri negativi all'interno della sommatoria quando, invece, dovremmo ottenere $0$ visto il fatto che non potrebbe mai avvenire un'eviction essendo sotto la soglia minima possibile. La formula risistemata è quindi:
+
 $$
 \begin{aligned}
 n(\text{FN}) &= \sum_{w = \left\lfloor \frac{3}{4} B \right\rfloor}^{T_{\max}} \max\left( 0, \;\frac{1}{2}w - T_{\min}(B) + 1 \right) \\
