@@ -6,6 +6,35 @@ from matplotlib.widgets import Slider, CheckButtons
 import numpy as np
 
 
+def parse_limit(val, backlog_size):
+    """
+    Given the backlog size and the value to parse, calculate the actual 
+    number for it. E.g. for backlog_size=20:
+     - val=0.1  -> ret 2
+     - val=50%  -> ret 10
+     - val=4    -> ret 4
+     - val=None -> ret None
+    """
+    if val is None:
+        return None
+    if isinstance(val, str):
+        val = float(val.rstrip("%")) / 100.0 if "%" in val else float(val)
+    if isinstance(val, float) and val <= 1.0:
+        return int(round(val * backlog_size))
+    return int(val)
+
+
+def is_pct_val(val):
+    """
+    Return True if the given string is a percentage
+    """
+    if val is None:
+        return False
+    if isinstance(val, str):
+        val = float(val.rstrip("%")) / 100.0 if "%" in val else float(val)
+    return isinstance(val, float) and val <= 1.0
+
+
 def calculate_default_limits(backlog_size, window_center, window_ratio=3 / 8):
     """
     Calculate T_min and T_max window limits centered around the window center threshold
@@ -39,6 +68,8 @@ def calculate_probabilities(
     Allows specifying either or both t_min and t_max limits as well as a separate
     window_center for dynamic limit calculations.
     """
+    t_min = parse_limit(t_min, backlog_size)
+    t_max = parse_limit(t_max, backlog_size)
 
     if act_thr is None:
         act_thr = 18 / 32
@@ -137,6 +168,9 @@ def calculate_probabilities_timeout(
     Calculate the probabilities for the 'window_timeout' scenario using
     the provided formula based on the window size w(B).
     """
+    t_min = parse_limit(t_min, backlog_size)
+    t_max = parse_limit(t_max, backlog_size)
+
     if act_thr is None:
         act_thr = 18 / 32
 
@@ -200,6 +234,9 @@ def sweep_window_sizes(
     size (fixing t_min and/or t_max if specified) and return the values that
     make the 4 probabilities as close to 0.5 as possible
     """
+    t_min = parse_limit(t_min, backlog_size)
+    t_max = parse_limit(t_max, backlog_size)
+
     best_result = None
     best_score = float("inf")
 
@@ -260,6 +297,9 @@ def sweep_window_sizes_timeout(
     Sweep for the window_timeout scenario, returning the values that
     make the 4 probabilities as close to 0.5 as possible
     """
+    t_min = parse_limit(t_min, backlog_size)
+    t_max = parse_limit(t_max, backlog_size)
+
     best_result = None
     best_score = float("inf")
 
@@ -381,7 +421,7 @@ def plot_probabilities(
     # values that are unreasonable, i.e. t_max that is bigger than
     # the backlog size, should not be plotted
     if t_max is not None and not sweep:
-        start_size = t_max
+        start_size = parse_limit(t_max, max_backlog_size)
 
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
     valid_sizes = []
@@ -499,7 +539,7 @@ def plot_probabilities_3d(
     scen_data = SCENARIOS[scenario]
 
     if t_max is not None and not sweep:
-        start_size = t_max
+        start_size = parse_limit(t_max, max_backlog_size)
 
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
     act_thrs = np.linspace(0.01, 0.99, 50) if act_thr is None else [act_thr]
@@ -575,8 +615,18 @@ def plot_sliders(
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
     initial_thr = act_thr if act_thr is not None else 18 / 32
     initial_center = window_center if window_center is not None else initial_thr
-    initial_t_min = t_min if t_min is not None else 0
-    initial_t_max = t_max if t_max is not None else max_backlog_size
+
+    initial_is_pct = is_pct_val(t_min) or is_pct_val(t_max)
+
+    def to_init_val(v, default, is_pct):
+        if v is None:
+            return default
+        if isinstance(v, str):
+            v = float(v.rstrip("%")) / 100.0 if "%" in v else float(v)
+        return float(v) if is_pct else parse_limit(v, max_backlog_size)
+
+    initial_t_min = to_init_val(t_min, 0.0 if initial_is_pct else 0, initial_is_pct)
+    initial_t_max = to_init_val(t_max, 1.0 if initial_is_pct else max_backlog_size, initial_is_pct)
     initial_use_t = t_min is not None or t_max is not None
 
     (line_tp,) = ax.plot([], [], label="True Positives P(TP)", color="green", lw=2)
@@ -623,30 +673,32 @@ def plot_sliders(
     slider_t_min = Slider(
         ax=ax_slider_t_min,
         label="T_min",
-        valmin=0,
-        valmax=max_backlog_size,
+        valmin=0.0 if initial_is_pct else 0,
+        valmax=1.0 if initial_is_pct else max_backlog_size,
         valinit=initial_t_min,
-        valstep=1,
-        valfmt="%d",
+        valstep=0.01 if initial_is_pct else 1,
+        valfmt="%0.2f" if initial_is_pct else "%d",
     )
 
     ax_slider_t_max = plt.axes([0.25, 0.10, 0.48, 0.03])
     slider_t_max = Slider(
         ax=ax_slider_t_max,
         label="T_max",
-        valmin=0,
-        valmax=max_backlog_size,
+        valmin=0.0 if initial_is_pct else 0,
+        valmax=1.0 if initial_is_pct else max_backlog_size,
         valinit=initial_t_max,
-        valstep=1,
-        valfmt="%d",
+        valstep=0.01 if initial_is_pct else 1,
+        valfmt="%0.2f" if initial_is_pct else "%d",
     )
 
     ax_check = plt.axes([0.78, 0.10, 0.18, 0.18])
     check = CheckButtons(
         ax=ax_check,
-        labels=["Sweep", "Specify T_min/T_max"],
-        actives=[sweep, initial_use_t],
+        labels=["Sweep", "Specify T_min/T_max", "T_min/T_max %"],
+        actives=[sweep, initial_use_t, initial_is_pct],
     )
+
+    prev_is_pct = initial_is_pct
 
     def set_slider_state(slider, active):
         slider.set_active(active)
@@ -663,12 +715,44 @@ def plot_sliders(
             slider.valtext.set_text(slider.valfmt % slider.val)
 
     def update(val):
-        nonlocal current_results
-        is_sweep, is_spec_t = check.get_status()
+        nonlocal current_results, prev_is_pct
+        is_sweep, is_spec_t, is_pct = check.get_status()
+
+        if not is_spec_t: # disable T_min/T_max percentage toggle when not needed
+            if is_pct:
+                check.eventson = False
+                check.set_active(2)
+                check.eventson = True
+                is_pct = False
+            check.labels[2].set_color("0.6")
+        else:
+            check.labels[2].set_color("black")
+
+        if is_pct != prev_is_pct:
+            prev_is_pct = is_pct
+            if is_pct:
+                new_min = slider_t_min.val / max_backlog_size
+                new_max = slider_t_max.val / max_backlog_size
+                slider_t_min.valmin, slider_t_min.valmax, slider_t_min.valstep, slider_t_min.valfmt = 0.0, 1.0, 0.01, "%0.2f"
+                slider_t_max.valmin, slider_t_max.valmax, slider_t_max.valstep, slider_t_max.valfmt = 0.0, 1.0, 0.01, "%0.2f"
+                slider_t_min.ax.set_xlim(0.0, 1.0)
+                slider_t_max.ax.set_xlim(0.0, 1.0)
+                slider_t_min.set_val(new_min)
+                slider_t_max.set_val(new_max)
+            else:
+                new_min = int(round(slider_t_min.val * max_backlog_size))
+                new_max = int(round(slider_t_max.val * max_backlog_size))
+                slider_t_min.valmin, slider_t_min.valmax, slider_t_min.valstep, slider_t_min.valfmt = 0, max_backlog_size, 1, "%d"
+                slider_t_max.valmin, slider_t_max.valmax, slider_t_max.valstep, slider_t_max.valfmt = 0, max_backlog_size, 1, "%d"
+                slider_t_min.ax.set_xlim(0, max_backlog_size)
+                slider_t_max.ax.set_xlim(0, max_backlog_size)
+                slider_t_min.set_val(new_min)
+                slider_t_max.set_val(new_max)
+
         curr_thr = slider_thr.val
         curr_center = slider_center.val
-        curr_t_min = int(slider_t_min.val)
-        curr_t_max = int(slider_t_max.val)
+        curr_t_min = slider_t_min.val if is_pct else int(slider_t_min.val)
+        curr_t_max = slider_t_max.val if is_pct else int(slider_t_max.val)
 
         set_slider_state(slider_thr, True)
         set_slider_state(slider_center, not is_sweep and not is_spec_t)
@@ -682,7 +766,8 @@ def plot_sliders(
             if is_sweep:
                 res = scen_data["sweep_fn"](size, act_thr=curr_thr)
             elif is_spec_t:
-                if size < curr_t_max:
+                actual_t_max = parse_limit(curr_t_max, size)
+                if size < actual_t_max:
                     res = None
                 else:
                     res = scen_data["calc_fn"](
@@ -714,7 +799,9 @@ def plot_sliders(
         if is_sweep:
             mode_str = "Sweep"
         elif is_spec_t:
-            mode_str = f"Fixed Limits (T_min={curr_t_min}, T_max={curr_t_max})"
+            t_min_str = f"{(curr_t_min*100):.2f}%" if is_pct else f"{curr_t_min}"
+            t_max_str = f"{(curr_t_max*100):.2f}%" if is_pct else f"{curr_t_max}"
+            mode_str = f"Fixed Limits (T_min={t_min_str}, T_max={t_max_str})"
         else:
             mode_str = "Dynamic Limits"
 
@@ -738,7 +825,6 @@ def plot_sliders(
     check.on_clicked(update)
     update(None)
     plt.show()
-
 
 def print_results(results, title="Calculation Results"):
     if not results:
@@ -830,7 +916,8 @@ Examples:
 
   \033[1;36m2. Calculate the probabilities with one or more specified t_min/t_max backlog size limits\033[0m
      python3 probability_calculator.py 64 --t_min 10 --t_max 40
-     python3 probability_calculator.py 64 --t_min 10
+     python3 probability_calculator.py 64 --t_min 0.2 --t_max 0.8
+     python3 probability_calculator.py 64 --t_min 20% --t_max 80%
 
   \033[1;36m3. Calculate the probabilities with a custom activation threshold and/or window center\033[0m
      python3 probability_calculator.py 64 --act_thr 0.5
@@ -881,16 +968,16 @@ Notes:
 
     parser.add_argument(
         "--t_min",
-        type=int,
+        type=str,
         required=False,
-        help="lower limit for the backlog window size",
+        help="lower limit for the backlog window size (int, ratio float <= 1.0, or percentage)",
     )
 
     parser.add_argument(
         "--t_max",
-        type=int,
+        type=str,
         required=False,
-        help="upper limit for the backlog window size",
+        help="upper limit for the backlog window size (int, ratio float <= 1.0, or percentage)",
     )
 
     parser.add_argument(
