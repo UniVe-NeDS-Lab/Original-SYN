@@ -20,20 +20,20 @@ $$
 #### Limite inferiore soglia
 
 $$
-\text{base\_threshold} = \text{backlog\_size} \cdot \frac{3}{8}
+\text{base\_threshold} = \text{backlog\\\_size} \cdot \frac{3}{8}
 $$
 
 #### Range di estrazione della soglia
 
 $$
-\text{range} = \left(\text{backlog\_size} \cdot \frac{6}{8}\right) + 1 - \text{base\_threshold}
+\text{range} = \left(\text{backlog\\\_size} \cdot \frac{6}{8}\right) + 1 - \text{base\_threshold}
 $$
 
 #### Estrazione effettiva
 Calcolo della nuova soglia di _eviction_ casuale per contrastare l'inferenza dell'attaccante:
 
 $$
-\text{sk\_max\_ack\_backlog\_custom} = (\text{random\_num} \bmod (\text{range} + 1)) + \text{base\_threshold}
+\text{sk\_max\_ack\_backlog\_custom} = (\text{random\\\_num} \bmod (\text{range} + 1)) + \text{base\_threshold}
 $$
 
 -> è tutto documentato direttamente nel codice in `Vagrant/zombie_files/kernel/net/ipv4/inet_connection_sock.c` a riga 1192.
@@ -45,7 +45,7 @@ $$
 ### Probabilità di selezione una soglia uguale
 
 $$
-P_s = \frac{1}{\left(\frac{6}{8} - \frac{3}{8}\right) \cdot \text{backlog\_size} + 2} = \frac{1}{\frac{3}{8} \cdot \text{backlog\_size} + 2}
+P_s = \frac{1}{\left(\frac{6}{8} - \frac{3}{8}\right) \cdot \text{backlog\_size} + 2} = \frac{1}{\frac{3}{8} \cdot \text{backlog\\\_size} + 2}
 $$
 
   
