@@ -236,6 +236,57 @@ def calculate_probabilities_timeout(
     }
 
 
+def calculate_bayes_probabilities(results, base_prob=0.5):
+    """
+    Calculates the Bayesian probabilities for the attacker's perspective
+    given a base prior probability: P(Alive) = base_prob, P(Not Alive) = 1 - base_prob
+    Note that this appends the inferences to the results dictionary!
+    """
+    if results is None:
+        return None
+
+    if isinstance(base_prob, str):
+        base_prob = float(base_prob.rstrip("%")) / 100.0 if "%" in base_prob else float(base_prob)
+
+    p_tp = results["p_tp"]
+    p_tn = results["p_tn"]
+    p_fp = results["p_fp"]
+    p_fn = results["p_fn"]
+
+    # How the probabilities are "arranged"
+    # 
+    #                                - p_tp -> Classified Alive (TP)
+    #                               /
+    #      base_prob  ->   Alive   -
+    #   /                           \
+    #  /                             - p_fn -> Classified Not Alive (FN)
+    # - 
+    #  \                             - p_fp -> Classified Alive (FP)
+    #   \                           /
+    #     1-base_prob -> Not Alive -
+    #                               \
+    #                                - p_tn -> Classified Not Alive (TN)
+
+    # Denominators
+    den_a =  (base_prob * p_tp) + ((1.0 - base_prob) * p_fp)
+    den_na = (base_prob * p_fn) + ((1.0 - base_prob) * p_tn)
+
+    # P(Alive | Classified Alive)
+    results["b_p_aa"] = (p_tp * base_prob) / den_a if den_a > 0 else float('nan')
+    # P(Not Alive | Classified Alive)
+    results["b_p_naa"] = (p_fp * (1.0 - base_prob)) / den_a if den_a > 0 else float('nan')
+    # P(Alive | Classified Not Alive)
+    results["b_p_ana"] = (p_fn * base_prob) / den_na if den_na > 0 else float('nan')
+    # P(Not Alive | Classified Not Alive)
+    results["b_p_nana"] = (p_tn * (1.0 - base_prob)) / den_na if den_na > 0 else float('nan')
+
+    results["b_base_prob"] = base_prob
+
+    print(results)
+
+    return results
+
+
 def sweep_window_sizes(
     backlog_size, act_thr=None, window_center=None, t_min=None, t_max=None
 ):
@@ -429,8 +480,8 @@ def plot_probabilities(
 
     # when not sweeping and if the t_max argument has been specified,
     # values that are unreasonable, i.e. t_max that is bigger than
-    # the backlog size, should not be plotted
-    if t_max is not None and not sweep:
+    # the backlog size and isn't a percentage, should not be plotted
+    if t_max is not None and not sweep and not is_pct_val(t_max):
         start_size = parse_limit(t_max, max_backlog_size)
 
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
@@ -537,6 +588,139 @@ def plot_probabilities(
     plt.tight_layout()
     plt.show()
 
+def plot_probabilities_bayes(
+    max_backlog_size,
+    scenario="window",
+    sweep=False,
+    act_thr=None,
+    window_center=None,
+    t_min=None,
+    t_max=None,
+    base_prob=0.5,
+):
+    """
+    Plots the probabilities from the attacker's perspective using Bayes' theorem given a base probability.
+    """
+    start_size = 1
+    scen_data = SCENARIOS[scenario]
+
+    # when not sweeping and if the t_max argument has been specified,
+    # values that are unreasonable, i.e. t_max that is bigger than
+    # the backlog size and isn't a percentage, should not be plotted
+    if t_max is not None and not sweep and not is_pct_val(t_max):
+        start_size = parse_limit(t_max, max_backlog_size)
+
+    backlog_sizes = list(range(start_size, max_backlog_size + 1))
+    valid_sizes = []
+
+    # Bayesian perspective probabilities
+    b_p_aa, b_p_naa, b_p_ana, b_p_nana = [], [], [], []
+    results_list = []
+
+    for size in backlog_sizes:
+        if sweep:
+            res = scen_data["sweep_fn"](
+                size,
+                act_thr=act_thr,
+                window_center=window_center,
+                t_min=t_min,
+                t_max=t_max,
+            )
+        else:
+            res = scen_data["calc_fn"](
+                size,
+                act_thr=act_thr,
+                window_center=window_center,
+                t_min=t_min,
+                t_max=t_max,
+            )
+
+        if res is None:
+            continue
+
+        res = calculate_bayes_probabilities(res, base_prob=base_prob)
+
+        valid_sizes.append(size)
+        results_list.append(res)
+        
+        b_p_aa.append(res["b_p_aa"])
+        b_p_naa.append(res["b_p_naa"])
+        b_p_ana.append(res["b_p_ana"])
+        b_p_nana.append(res["b_p_nana"])
+
+    if not valid_sizes:
+        print("No valid parameter ranges to plot")
+        return
+
+    plt.figure(figsize=(10, 6))
+    (line_aa,) = plt.plot(
+        valid_sizes,
+        b_p_aa,
+        label="P(Alive | Classified Alive)",
+        color="green",
+        linewidth=2,
+    )
+    (line_nana,) = plt.plot(
+        valid_sizes,
+        b_p_nana,
+        label="P(Not Alive | Classified Not Alive)",
+        color="blue",
+        linewidth=2,
+    )
+    (line_naa,) = plt.plot(
+        valid_sizes,
+        b_p_naa,
+        label="P(Not Alive | Classified Alive)",
+        color="orange",
+        linewidth=2,
+        linestyle="--",
+    )
+    (line_ana,) = plt.plot(
+        valid_sizes,
+        b_p_ana,
+        label="P(Alive | Classified Not Alive)",
+        color="red",
+        linewidth=2,
+        linestyle="--",
+    )
+
+    add_hover_annotation(
+        plt.gcf(),
+        plt.gca(),
+        [line_aa, line_nana, line_naa, line_ana],
+        lambda i: results_list[i],
+    )
+
+    title_act_thr = format_pct(act_thr) if act_thr is not None else "Default"
+    if window_center is not None:
+        title_window_center = format_pct(window_center)
+    elif act_thr is not None:
+        title_window_center = format_pct(act_thr)
+    else:
+        title_window_center = "Default"
+        
+    if sweep:
+        plt.title(
+            f"[{scen_data['title']}] Attacker Inference (Bayes) vs Backlog Size\n"
+            f"(Sweep, Threshold={title_act_thr})",
+            fontsize=14,
+        )
+    else:
+        title_t_min = t_min if t_min is not None else "Dynamic"
+        title_t_max = t_max if t_max is not None else "Dynamic"
+        plt.title(
+            f"[{scen_data['title']}] Attacker Inference (Bayes) vs Backlog Size\n"
+            f"(T_min={title_t_min}, T_max={title_t_max}, Thr={title_act_thr}, Center={title_window_center})",
+            fontsize=14,
+        )
+
+    plt.xlabel("Backlog Size", fontsize=12)
+    plt.ylabel("Inferred Probability (Attacker View)", fontsize=12)
+    plt.ylim(-0.05, 1.05)
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend(fontsize=11)
+    plt.tight_layout()
+    plt.show()
 
 def plot_probabilities_3d(
     max_backlog_size,
@@ -554,7 +738,7 @@ def plot_probabilities_3d(
     start_size = 1
     scen_data = SCENARIOS[scenario]
 
-    if t_max is not None and not sweep:
+    if t_max is not None and not sweep and not is_pct_val(t_max):
         start_size = parse_limit(t_max, max_backlog_size)
 
     backlog_sizes = list(range(start_size, max_backlog_size + 1))
@@ -885,6 +1069,14 @@ def print_results(results, title="Calculation Results"):
     print(f"P(TP): {results['p_tp']:.6f}")
     print(f"P(TN): {results['p_tn']:.6f}")
 
+    if "b_p_aa" in results:
+        print("-" * 25)
+        print(f"--- Attacker Inference (Bayes, target alive with probability {results["b_base_prob"]*100}%) ---")
+        print(f"P(Alive | Classified Alive):         {results['b_p_aa']:.6f}")
+        print(f"P(Not Alive | Classified Alive):     {results['b_p_naa']:.6f}")
+        print(f"P(Alive | Classified Not Alive):     {results['b_p_ana']:.6f}")
+        print(f"P(Not Alive | Classified Not Alive): {results['b_p_nana']:.6f}")
+
     print("-" * 25)
     total = results["total_sample_space"]
     print(
@@ -976,11 +1168,16 @@ Examples:
   \033[1;36m10. Run calculations with the alternate 'window_timeout' scenario\033[0m
      python3 probability_calculator.py 32 --scenario window_timeout
 
+  \033[1;36m11. Calculate/plot Bayesian probabilities with a custom base probability (e.g., 0.5% or 0.005)\033[0m
+     python3 probability_calculator.py 32 --bayes_base_prob 0.5%
+     python3 probability_calculator.py 32 --plot_bayes --bayes_base_prob 0.005
+
 Notes:
-  \033[2m--plot\033[0m        Plot the 2D results
-  \033[2m--plot_3d\033[0m     Plot the 3D surface results
-  \033[2m--sliders\033[0m     Interactive 2D view along sliders to change the values
-  \033[2m--sweep\033[0m       Search for the best t_min/t_max backlog size limits
+  \033[2m--plot\033[0m            Plot the 2D results
+  \033[2m--plot_3d\033[0m         Plot the 3D surface results
+  \033[2m--sliders\033[0m         Interactive 2D view along sliders to change the values
+  \033[2m--sweep\033[0m           Search for the best t_min/t_max backlog size limits
+  \033[2m--bayes_base_prob\033[0m Base probability for Bayesian calculations (default: 0.5)
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -1036,6 +1233,20 @@ Notes:
     )
 
     parser.add_argument(
+        "--plot_bayes",
+        action="store_true",
+        help="Plot the probabilities from the attacker's perspective (Bayesian ones)",
+    )
+
+    parser.add_argument(
+        "--bayes_base_prob",
+        "--base_prob",
+        type=str,
+        default="0.5",
+        help="base probability P(Alive) for Bayesian calculations (float or percentage, defaults to 0.5)",
+    )
+
+    parser.add_argument(
         "--plot_3d",
         action="store_true",
         help="Plot 3D surface graph of probabilities across backlog sizes and activation thresholds",
@@ -1079,6 +1290,17 @@ Notes:
             t_min=args.t_min,
             t_max=args.t_max,
         )
+    elif args.plot_bayes:
+        plot_probabilities_bayes(
+            args.backlog_size,
+            scenario=args.scenario,
+            sweep=args.sweep,
+            act_thr=args.act_thr,
+            window_center=args.window_center,
+            t_min=args.t_min,
+            t_max=args.t_max,
+            base_prob=args.bayes_base_prob,
+        )
     elif args.sweep:
         results = SCENARIOS[args.scenario]["sweep_fn"](
             args.backlog_size,
@@ -1087,6 +1309,7 @@ Notes:
             t_min=args.t_min,
             t_max=args.t_max,
         )
+        results = calculate_bayes_probabilities(results, base_prob=args.bayes_base_prob)
         print_results(
             results,
             title=f"Best Window From Sweep [{SCENARIOS[args.scenario]['title']}]",
@@ -1099,6 +1322,7 @@ Notes:
             t_min=args.t_min,
             t_max=args.t_max,
         )
+        results = calculate_bayes_probabilities(results, base_prob=args.bayes_base_prob)
         print_results(
             results, title=f"Calculation Results [{SCENARIOS[args.scenario]['title']}]"
         )
