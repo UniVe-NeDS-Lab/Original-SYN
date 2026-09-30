@@ -2,9 +2,11 @@ Raccolta di formule estratte dalla tesi al fine di effettuare l'analisi statisti
 ## Miscellaneous 
 #### Pacchetti SYN per arrivare alla threshold
 Calcola il numero di pacchetti SYN inviati dall'attaccante per riempire la coda:
+
 $$
 N = \frac{3}{4} \cdot B_{\text{guess}}
 $$
+
 - **$N$**: Numero totale di pacchetti inviati.
 - **$B_{\text{guess}}$**: Dimensione presunta (assunta dall'attaccante) del backlog (coda).
 
@@ -16,16 +18,24 @@ $$
 
 ## Formule usate per la scelta della soglia nel Kernel
 #### Limite inferiore soglia
+
 $$
 \text{base\_threshold} = \text{backlog\_size} \cdot \frac{3}{8}
 $$
+
 #### Range di estrazione della soglia
+
 $$
 \text{range} = \left(\text{backlog\_size} \cdot \frac{6}{8}\right) + 1 - \text{base\_threshold}
 $$
+
 #### Estrazione effettiva
 Calcolo della nuova soglia di _eviction_ casuale per contrastare l'inferenza dell'attaccante:
-$$\text{sk\_max\_ack\_backlog\_custom} = (\text{random\_num} \bmod (\text{range} + 1)) + \text{base\_threshold}$$
+
+$$
+\text{sk\_max\_ack\_backlog\_custom} = (\text{random\_num} \bmod (\text{range} + 1)) + \text{base\_threshold}
+$$
+
 -> è tutto documentato direttamente nel codice in `Vagrant/zombie_files/kernel/net/ipv4/inet_connection_sock.c` a riga 1192.
   
 
@@ -33,13 +43,18 @@ $$\text{sk\_max\_ack\_backlog\_custom} = (\text{random\_num} \bmod (\text{range}
 
 ## Analisi probabilistica (capitolo 4.2)
 ### Probabilità di selezione una soglia uguale
+
 $$
 P_s = \frac{1}{\left(\frac{6}{8} - \frac{3}{8}\right) \cdot \text{backlog\_size} + 2} = \frac{1}{\frac{3}{8} \cdot \text{backlog\_size} + 2}
 $$
 
   
 ### Valori limite per la soglia di eviction
-$$T_{\min}(B) = \left\lfloor \frac{3}{8} B \right\rfloor \quad \text{e} \quad T_{\max}(B) = \left\lfloor \frac{6}{8} B \right\rfloor + 1$$
+
+$$
+T_{\min}(B) = \left\lfloor \frac{3}{8} B \right\rfloor \quad \text{e} \quad T_{\max}(B) = \left\lfloor \frac{6}{8} B \right\rfloor + 1
+$$
+
 -> nota: con $T_n$ indicheremo la threshold <u>reale</u> a tempo $n$
 
 
@@ -49,13 +64,21 @@ $$w(B) = T_{\max}(B) - T_{\min}(B) + 1$$
   
 ### Spazio campionario totale
 Scelta del kernel per scelta dell'attaccante. 
-$$\text{Spazio Campionario Totale} = w(B)^2$$
+
+$$
+\text{Spazio Campionario Totale} = w(B)^2
+$$
+
 -> Reminder che la soglia viene cambiata dopo che l'attaccante ha trovato la threshold con la prima parte dell'attacco, ovvero $T_{n−1} \cdot T_n$ con $T_n$ la threshold a tempo $n$.
   
 
 ### Numero di pacchetti inviati a tempo $n$
 Inviamo lo stesso numero di pacchetti canary e di connessioni spoofed, quindi:
-$$C_n = S_n = \frac{3}{4} B \cdot \frac{1}{2} = \left(\frac{3}{4} B\right ) \cdot \frac{1}{2} = \left( T_{n-1} \right) \cdot \frac{1}{2}$$
+
+$$
+C_n = S_n = \frac{3}{4} B \cdot \frac{1}{2} = \left(\frac{3}{4} B\right ) \cdot \frac{1}{2} = \left( T_{n-1} \right) \cdot \frac{1}{2}
+$$
+
 -> nel complesso inviamo $C_n+S_n= T_{n-1}$ pacchetti
 -> indichiamo con $C_n^\prime$ e $S_n^\prime$ i pacchetti che sopravvivono nella coda a tempo $n$
   
