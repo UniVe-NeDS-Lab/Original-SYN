@@ -1,3 +1,4 @@
+# Aggiunta dei Timeout alla Mitigazione Precedente
 Una possibile modifica che si può fare è quella di usare dei timeout per l'effettiva eviction delle connessioni a seguito di un reset. Questo significa che esse rimarranno nel backlog fino a che non scadrà un certo timer facendo si che, anche nel caso in cui la vittima fosse attiva, il kernel supererebbe la soglia che andrebbe a fare l'eviction anche di una parte dei canary.
 
 Iniziamo assumendo che il timer usato per i canary sia sicuramente inferiore a quello che scatenerà la cancellazione delle connessioni semiaperte a seguito del superamento della soglia, ma anche dell'intervallo di tempo massimo permesso ad una connessione semiaperta prima di essere automaticamente rimossa. Questo è ragionevole essendo che il tempo è determinato dallo zombie, quindi possiamo impostare un timer pari o superiore a quello.
@@ -66,3 +67,56 @@ Notiamo immediatamente un fatto molto interessante, ovvero che al crescere di $w
 Notiamo anche come veri e falsi positivi/negativi assumano la stessa probabilità, cosa che ci permette di concludere che una vittima venga classificata correttamente nel $50\%$ dei casi, con un certo bias verso il classificarle come Not-Alive per dimensioni della backlog molto basse. Questo fatto è supportato dal plot delle probabilità condizionate, ovvero quelle che "vedrebbe" l'attaccante se potesse sapere in un secondo momento lo stato effettivo della vittima:![Probabilità Bayes con il 50% Alive](Immagini/ProbabilitiesBayes50.png)
 
 Se volessimo cambiare la percentuale di vittime che assumiamo essere vive dietro ad uno zombie, vedremmo correttamente come la probabilità di vittima Alive o meno sia sempre uguale sia che l'attaccante le abbia classificate come Alive o Not-Alive. L'unica differenza rispetto al grafico precedente è che abbiamo più vittime vive (il $90\%$), cosa che effettua lo "scostamento" delle probabilità.![Probabilità Bayes con il 90% Alive](Immagini/ProbabilitiesBayes90.png)
+
+
+
+# Mitigazione con solo Timeout e Percentuale Durata
+Possiamo notare come la mitigazione in se non necessiti più della [soglia variabile](Teoria.md) in quanto, avendo un timeout pari al tempo impiegato dalle connessioni a venire eliminate, otteniamo un comportamento delle connessioni nella SYN queue analogo sia per vittime alive che per le not-alive. 
+
+Possiamo quindi introdurre la variabile aleatoria seguente, la quale estrae valori usati per la durata del timer da un'uniforme fra due soglie $tm_{min}$ per il tempo minimo e $tm_{max}$ per quello massimo: 
+$$
+timer\_pct\sim U(tm_{min}, tm_{max})
+$$
+il quale indicherà la percentuale di tempo per cui durerà il timer delle connessioni che ricevono un RST prima di essere rimosse effettivamente dalla backlog. Questo ci permetterà di analizzare l'impatto che avrà un timer più corto rispetto alla capacità dell'attaccante di capire il vero stato di una vittima.
+
+Con $tm_a$ indicheremo il tempo atteso dall'attaccante prima di verificare la presenza dei canary.
+
+Calcoliamo quindi le diverse probabilità
+- **occorrenze true positive $n(TP)$:** una vittima è correttamente identificata con probabilità $P(timer\_pct\le tm_a)$, ovvero:
+$$
+P(TP)=P(timer\_pct \le tm_a)=\int_{tm_{min}}^{tm_a} \frac{1}{tm_{max}-tm_{min}}=\frac{tm_a-tm_{min}}{tm_{max}-tm_{min}}
+$$
+- **occorrenze false negative $n(FN)$:** caso complementare del precedente, quindi procediamo come segue:
+$$
+\begin{aligned}
+P(FN)=1-P(TP)&=1-\frac{tm_a-tm_{min}}{tm_{max}-tm_{min}} \\
+& =\frac{tm_{max}-tm_{min}-tm_a+tm_{min}}{tm_{max}-tm_{min}} \\
+&=\frac{tm_{max}-tm_a}{tm_{max}-tm_{min}}
+\end{aligned}
+$$
+- **occorrenze true negative $n(TN)$:** una vittima not-alive non andrà ad attivare la mitigazione oltre al fatto che, non inviando i RST, causerà sempre l'eviction di una parte dei canary, quindi verrà sempre classificata come not-alive
+$$
+P(TN)=1
+$$
+- **occorrenze false positive $N(FP)$:** situazione analoga alla precedente, non avremmo mai delle classificazioni come attive, quindi:
+$$
+P(FP)=0
+$$
+
+Concludiamo quindi con la seguente tabella:
+
+|                      | **Classificazione Alive**                 | **Classificazione Not-Alive**               |
+| -------------------- | ----------------------------------------- | ------------------------------------------- |
+| **Target Alive**     | $\frac{tm_a-tm_{min}}{tm_{max}-tm_{min}}$ | $\frac{tm_{max}-tm_a}{tm_{max}-tm_{min}},1$ |
+| **Target Not-Alive** | $0$                                       | $1$                                         |
+Possiamo intuitivamente notare come appena l'attaccante rilevi che la vittima è attiva, esso abbia la certezza che lo sia effettivamente. 
+
+Tecnicamente dovremmo effettuare i controlli/conti seguenti per avere delle vere e proprie probabilità in output:
+$$
+P(TP)=\begin{cases}
+0 & tm_a \le tm_{min} \\
+\frac{tm_a - tm_{min}}{tm_{max} - tm_{min}} & tm_{min} < tm_a < tm_{max} \\
+1 & tm_a \ge tm_{max} \end{cases}
+\qquad\qquad\qquad
+P(FN)=1-P(TP)
+$$
