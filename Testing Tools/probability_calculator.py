@@ -767,10 +767,10 @@ def plot_whiskers(
             nominal_fn.append(np.nan)
 
         # Sweep bounds for t_min/t_max with ±20% of delta
-        lower_bound = max(0, int(math.floor((thr - max_delta_pct) * backlog_size)))
-        upper_bound = min(
-            backlog_size, int(math.ceil((thr + max_delta_pct) * backlog_size))
-        )
+        act_tmin = parse_limit(t_min, backlog_size)
+        act_tmax = parse_limit(t_max, backlog_size)
+        lower_bound = max(0, int(math.floor(act_tmin * 0.8)))
+        upper_bound = min(backlog_size, int(math.ceil((act_tmax * 1.2))))
 
         # Get samples for all the probabilities calculated with the various thresholds
         tps, tns, fps, fns = [], [], [], []
